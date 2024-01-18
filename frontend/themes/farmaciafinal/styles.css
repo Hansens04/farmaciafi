@@ -1,0 +1,16 @@
+@import url('./main-layout.css');
+@import url('./views/realizar-pedido-view.css');
+@import url('./views/actualizar-estado-pedido-view.css');
+@import url('./views/consultar-productos-abastecer-view.css');
+@import url('./views/pedidos-producto-view.css');
+@import url('./views/pedidos-proveedor-view.css');
+@import url('./views/ingresar-cliente-view.css');
+@import url('./views/facturas-cliente-view.css');
+@import url('./views/facturar-view.css');
+@import url('./views/estado-financiero-view.css');    html {
+      --lumo-base-color: #fffafa;
+      --lumo-error-color: hsl(3, 100%, 50%);
+      --lumo-error-color-50pct: hsla(3, 100%, 50%, 0.5);
+      --lumo-error-color-10pct: hsla(3, 100%, 50%, 0.1);
+
+    }
