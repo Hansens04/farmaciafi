@@ -1,6 +1,5 @@
 package com.farmaciafinal.views;
 
-import com.farmaciafinal.views.actualizarestadopedido.ActualizarEstadoPedidoView;
 import com.farmaciafinal.views.consultarproductosabastecer.ConsultarProductosAbastecerView;
 import com.farmaciafinal.views.estadofinanciero.EstadoFinancieroView;
 import com.farmaciafinal.views.facturar.FacturarView;
@@ -62,8 +61,6 @@ public class MainLayout extends AppLayout {
 
         nav.addItem(new SideNavItem("Ingresar Proveedor", IngresarProveedorView.class, LineAwesomeIcon.USER.create()));
         nav.addItem(new SideNavItem("Realizar Pedido", RealizarPedidoView.class,
-                LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("Actualizar Estado Pedido", ActualizarEstadoPedidoView.class,
                 LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
         nav.addItem(new SideNavItem("Consultar Productos Abastecer", ConsultarProductosAbastecerView.class,
                 LineAwesomeIcon.AMBULANCE_SOLID.create()));
