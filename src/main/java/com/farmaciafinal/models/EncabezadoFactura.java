@@ -16,18 +16,6 @@ public class EncabezadoFactura {
         this.id=id;
     }
 
-    public EncabezadoFactura() {
-        // Crear instancias de Cliente y Producto con datos específicos
-        Cliente cliente = new Cliente("1234567890", "Juan Pérez", "987654321","");
-        Producto producto = new Producto("P001", "Producto de Ejemplo", "Descripción del producto", 10, 2, 19.99);
-
-        // Asignar valores a la instancia de EncabezadoFactura
-        this.cliente = cliente;
-        this.producto = producto;
-        this.cantidad = 0; // Cantidad de productos en la factura
-        this.total = calcularTotal(producto.getPrecio(), cantidad);
-        this.id="2121";
-    }
 
     public String getId() {
         return id;

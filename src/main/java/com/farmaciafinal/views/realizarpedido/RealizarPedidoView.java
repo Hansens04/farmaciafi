@@ -9,6 +9,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -26,6 +27,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 
 @PageTitle("Realizar Pedido")
@@ -45,6 +47,7 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
 
     private final Grid<EncabezadoPedido> grid = new Grid<>(EncabezadoPedido.class, false);
     private final ComboBox<String> estadoComboBox = new ComboBox<>("Estado del Pedido");
+    private final DatePicker fechaEnvioPicker = new DatePicker("Fecha de Envío");
 
     private EncabezadoPedido encabezadoPedidoEnEdicion;
 
@@ -75,12 +78,16 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         estadoComboBox.setItems(Arrays.asList("Enviado", "En Proceso", "Entregado", "Cancelado"));
         estadoComboBox.getStyle().set("margin-top", "-1.5em");
 
+        fechaEnvioPicker.setWidth("100%");
+        formLayout2Col.add(fechaEnvioPicker);
+
         guardar.addClickListener(e -> {
             Proveedor proveedorSeleccionado = proveedorComboBox.getValue();
             Producto productoSeleccionado = productoComboBox.getValue();
             int cantidad = cantidadF.getValue().intValue();
             String id = idPedido.getValue();
             String estadoPedido = estadoComboBox.getValue();
+            LocalDate fechaEnvio = fechaEnvioPicker.getValue();
 
             // Calcular el total
             double total = calcularTotal(productoSeleccionado.getPrecio(), cantidad);
@@ -89,23 +96,23 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
             // Actualizar encabezado existente o agregar nuevo encabezado a la lista
             if (encabezadoPedidoEnEdicion != null) {
                 // Si existe un encabezado en edición, actualiza sus propiedades
-                encabezadoPedidoEnEdicion.actualizar(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido);
+                encabezadoPedidoEnEdicion.actualizar(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido, fechaEnvio);
             } else {
                 // Si no existe, agrega un nuevo encabezado a la lista
-                EncabezadoPedido nuevoEncabezado = new EncabezadoPedido(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido);
+                EncabezadoPedido nuevoEncabezado = new EncabezadoPedido(productoSeleccionado,cantidad,total,id,proveedorSeleccionado,estadoPedido,fechaEnvio);
+
                 Utils.listaEncabezadoPedido.add(nuevoEncabezado);
                 encabezadoPedidoEnEdicion = nuevoEncabezado;  // Actualiza la referencia al encabezado en edición
             }
 
             // Luego, llama al método actualizar con los parámetros
-            encabezadoPedidoEnEdicion.actualizar(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido);
+            encabezadoPedidoEnEdicion.actualizar(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido, fechaEnvio);
 
             // Actualiza el Grid y limpia los campos
             actualizarGridYLimpiarCampos();
 
             Notification.show("Pedido guardado exitosamente", 3000, Notification.Position.MIDDLE);
         });
-
 
         cancelar.setWidth("min-content");
         cancelar.addClickListener(e -> {
@@ -129,10 +136,12 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         layoutRow.add(cancelar);
 
         grid.addColumn(EncabezadoPedido::getCodigoPedido).setHeader("ID").setAutoWidth(true);
+        grid.addColumn(EncabezadoPedido::getFechaEnvio).setHeader("Fecha de Envío").setAutoWidth(true);
         grid.addColumn(encabezadoPedido -> encabezadoPedido.getProveedor().getNombreProveedor()).setHeader("Proveedor").setAutoWidth(true);
         grid.addColumn(encabezadoPedido -> encabezadoPedido.getProducto().getNombreProducto()).setHeader("Producto").setAutoWidth(true);
         grid.addColumn(EncabezadoPedido::getCantidad).setHeader("Cantidad").setAutoWidth(true);
         grid.addColumn(EncabezadoPedido::getTotal).setHeader("Total").setAutoWidth(true);
+
         grid.addColumn(EncabezadoPedido::getEstado).setHeader("Estado").setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(encabezadoPedido -> {
             Button botonBorrar = new Button(new Icon(VaadinIcon.TRASH));
@@ -166,6 +175,7 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         totalField.setValue(encabezadoPedido.getTotal());
         idPedido.setValue(encabezadoPedido.getCodigoPedido());
         estadoComboBox.setValue(encabezadoPedido.getEstado());
+        fechaEnvioPicker.setValue(encabezadoPedido.getFechaEnvio());
     }
 
     private void borrarPedido(EncabezadoPedido encabezadoPedido) {
@@ -173,6 +183,7 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         grid.setItems(Utils.listaEncabezadoPedido);
         Notification.show("Pedido borrado exitosamente", 3000, Notification.Position.MIDDLE);
     }
+
     private void actualizarGridYLimpiarCampos() {
         // Actualiza el Grid
         grid.setItems(Utils.listaEncabezadoPedido);
@@ -181,7 +192,6 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         limpiarCampos();
     }
 
-
     private void limpiarCampos() {
         proveedorComboBox.clear();
         productoComboBox.clear();
@@ -189,6 +199,7 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         totalField.clear();
         idPedido.clear();
         estadoComboBox.clear();
+        fechaEnvioPicker.clear();
         encabezadoPedidoEnEdicion = null;
         guardar.setText("Guardar");
     }

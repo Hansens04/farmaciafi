@@ -1,4 +1,5 @@
 package com.farmaciafinal.models;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,12 +8,19 @@ public class EncabezadoPedido {
     private int cantidad;
     private double total;
     private String id;
-    private Proveedor proveedores;
 
     private String estado;
     private Proveedor proveedor;
+    private LocalDate fechaEnvio;
 
-    public EncabezadoPedido(Proveedor proveedorSeleccionado, Producto productoSeleccionado, int cantidad, double total, String value, String estadoPedido) {
+    public EncabezadoPedido(Producto producto, int cantidad, double total, String id, Proveedor proveedor,String estadodelpedido, LocalDate fechaEnvio) {
+        this.producto = producto;
+        this.cantidad = cantidad;
+        this.total = total;
+        this.id = id;
+        this.proveedor = proveedor;
+        this.estado=estadodelpedido;
+        this.fechaEnvio = fechaEnvio;
     }
 
     // ... (resto de la clase)
@@ -30,21 +38,16 @@ public class EncabezadoPedido {
     }
 
     private List<DetallePedido> detalleP;
-    public EncabezadoPedido() {
-        this.proveedor = new Proveedor("", "", "", "", List.of(""));
-        this.producto = new Producto("",",","",2,2,2);
-        this.cantidad = 0;
-        this.total = 0.0;
-        this.id = "";
-        this.estado = "";
-    }
-    public void actualizar(Proveedor proveedor, Producto producto, int cantidad, double total, String id, String estado) {
+
+    public void actualizar(Proveedor proveedor, Producto producto, int cantidad, double total, String id, String estado, LocalDate fechaEnvio) {
         this.proveedor = proveedor; // Update this line
         this.producto = producto;
         this.cantidad = cantidad;
         this.total = total;
         this.id = id;
         this.estado = estado;
+        this.fechaEnvio=fechaEnvio;
+
     }
 
     public int getCantidad() {
@@ -59,28 +62,18 @@ public class EncabezadoPedido {
         return total;
     }
 
-    public void setTotal(double total) {
-        this.total = total;
-    }
+
 
     public Proveedor getProveedores() {
-        return proveedores;
+        return proveedor;
     }
 
     public String getCodigoPedido(){
         return id;
     }
-    public String estadoPedido(){
-        return estado;
-    }
-    public void actualizarEstadoEnviado(String estadoPedido){
-        this.estado=estadoPedido;
-    }
 
 
-    public void modificarEncabezado(Proveedor pProveedor, Fecha pFecha){
-        this.proveedores= pProveedor;
-    }
+
     public List<DetallePedido> getDetalleP(){
         return detalleP;
     }
@@ -99,10 +92,6 @@ public class EncabezadoPedido {
         }
     }
 
-    public void modificarEncabezado(int dia, int mes, int anio, String nombreProveedor,
-                                    String telefono, String codigoProducto,String codigoProveedor,String direccion){
-        this.proveedores = new Proveedor(nombreProveedor, telefono,codigoProveedor,direccion, Arrays.asList(codigoProducto));
-    }
 
 
     public Proveedor getProveedor() {
@@ -112,4 +101,8 @@ public class EncabezadoPedido {
     public Producto getProducto() {
         return producto;
     }
+    public LocalDate getFechaEnvio() {
+        return fechaEnvio;
+    }
+
 }

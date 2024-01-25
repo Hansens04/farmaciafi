@@ -19,22 +19,8 @@ public class Cliente {
         this.direccion = direccion;
     }
 
-    public Cliente() {
-        nombre="";
-        cedula="";
-        telefono="";
-        direccion="";
 
-    }
 
-    public void modificarCliente(String nuevoNombre, String nuevaCedula, String nuevoTelefono, String nuevaDireccion) {
-        validarDatosEntrada(nuevoNombre, nuevaCedula, nuevoTelefono);
-
-        this.nombre = nuevoNombre;
-        this.cedula = nuevaCedula;
-        this.telefono = nuevoTelefono;
-        this.direccion = nuevaDireccion;
-    }
 
     private void validarDatosEntrada(String nombre, String cedula, String telefono) {
         if (nombre == null || nombre.isEmpty() || cedula == null || cedula.isEmpty() || telefono == null || telefono.isEmpty()) {

@@ -9,13 +9,6 @@ public class DetalleFactura {
     private double descuento;
     private double total;
 
-    public DetalleFactura() {
-        this.productos = new ArrayList<>();
-        this.subtotal = 0.0;
-        this.descuento = 0.0;
-        this.total = 0.0;
-    }
-
     public List<Producto> getProductos() {
         return productos;
     }
