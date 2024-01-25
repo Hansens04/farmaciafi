@@ -59,22 +59,25 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
+        nav.addItem(new SideNavItem("Ingresar Productos", IngresarProductosView.class,
+        LineAwesomeIcon.NOTES_MEDICAL_SOLID.create()));
         nav.addItem(new SideNavItem("Ingresar Proveedor", IngresarProveedorView.class, LineAwesomeIcon.USER.create()));
+        nav.addItem(new SideNavItem("Ingresar Cliente", IngresarClienteView.class,
+                LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
         nav.addItem(new SideNavItem("Realizar Pedido", RealizarPedidoView.class,
                 LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
+        nav.addItem(new SideNavItem("Facturar", FacturarView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
         nav.addItem(new SideNavItem("Consultar Productos Abastecer", ConsultarProductosAbastecerView.class,
                 LineAwesomeIcon.AMBULANCE_SOLID.create()));
-        nav.addItem(new SideNavItem("Ingresar Productos", IngresarProductosView.class,
-                LineAwesomeIcon.NOTES_MEDICAL_SOLID.create()));
+       
         nav.addItem(new SideNavItem("Pedidos Producto", PedidosProductoView.class,
                 LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
         nav.addItem(new SideNavItem("Pedidos Proveedor", PedidosProveedorView.class,
                 LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("Ingresar Cliente", IngresarClienteView.class,
-                LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
+        
         nav.addItem(new SideNavItem("Facturas Cliente", FacturasClienteView.class,
                 LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
-        nav.addItem(new SideNavItem("Facturar", FacturarView.class, LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
+        
         nav.addItem(new SideNavItem("Estado Financiero", EstadoFinancieroView.class,
                 LineAwesomeIcon.PENCIL_RULER_SOLID.create()));
 
