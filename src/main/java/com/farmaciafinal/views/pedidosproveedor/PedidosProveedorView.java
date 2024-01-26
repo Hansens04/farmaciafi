@@ -20,10 +20,13 @@ import java.util.stream.Collectors;
 @Route(value = "pedidos-proveedor", layout = MainLayout.class)
 @Uses(Icon.class)
 public class PedidosProveedorView extends Composite<VerticalLayout> {
+    // Componentes de la interfaz de usuario
     private ComboBox<Proveedor> proveedorComboBox;
     private Grid<EncabezadoPedido> pedidoGrid;
 
+    // Constructor de la vista
     public PedidosProveedorView() {
+        // Configuración del diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
 
@@ -43,6 +46,7 @@ public class PedidosProveedorView extends Composite<VerticalLayout> {
         getContent().add(proveedorComboBox, pedidoGrid);
     }
 
+    // Método para buscar pedidos por proveedor
     private void buscarPedidosPorProveedor(Proveedor proveedorSeleccionado) {
         if (proveedorSeleccionado == null) {
             // Si no se ha seleccionado ningún proveedor, limpiar el grid

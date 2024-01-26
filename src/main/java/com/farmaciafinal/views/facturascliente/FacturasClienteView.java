@@ -17,6 +17,7 @@ import com.vaadin.flow.router.Route;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Define el título de la página y la ruta para esta vista
 @PageTitle("Facturas Cliente")
 @Route(value = "facturas-cliente", layout = MainLayout.class)
 @Uses(Icon.class)
@@ -25,7 +26,9 @@ public class FacturasClienteView extends Composite<VerticalLayout> {
     private Button buscarButton;
     private Grid<EncabezadoFactura> grid;
 
+    // Constructor de la vista
     public FacturasClienteView() {
+        // Configuración de diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
 
@@ -46,6 +49,7 @@ public class FacturasClienteView extends Composite<VerticalLayout> {
         getContent().add(clienteComboBox, buscarButton, grid);
     }
 
+    // Método para buscar las facturas del cliente seleccionado
     private void buscarFacturas() {
         Cliente clienteSeleccionado = clienteComboBox.getValue();
         if (clienteSeleccionado == null) {

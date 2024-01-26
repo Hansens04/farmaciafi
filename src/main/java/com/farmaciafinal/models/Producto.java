@@ -4,14 +4,15 @@ import com.vaadin.flow.component.textfield.NumberField;
 import java.util.List;
 
 public class Producto {
+    //Atributos
     private String idProducto;
     private String nombreProducto;
     private int stock;
     private int cantidadMinima;
     private String descripcion;
     private double precio;
-    private List<DetallePedido> detalleP;
 
+    //Constructor
     public Producto(String idProducto, String nombreProducto, String descripcion,
                     int stock, int cantidadMinima, double precio){
         this.idProducto= idProducto;
@@ -22,7 +23,8 @@ public class Producto {
         this.precio=precio;
     }
 
-    public Producto(String codigoProducto, String nombreProducto, String descripcion, NumberField stock, int cantidadProducto, double precioProducto) {
+    public Producto(String codigoProducto, String nombreProducto, String descripcion, 
+    NumberField stock, int cantidadProducto, double precioProducto) {
     }
 
     public String getIdProducto() {
@@ -72,6 +74,8 @@ public class Producto {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
+
+    //Metodo para modificar productos
     public void modificarProducto(String pIdProducto,String pNombreProducto, String pDescripcion,
                                   int pStock, int pCantidadMinima, double pPrecio){
         this.idProducto= pIdProducto;
@@ -81,6 +85,8 @@ public class Producto {
         this.cantidadMinima= pCantidadMinima;
         this.precio=pPrecio;
     }
+
+    //Metodo para saber cuando se necesita reestablecimiento
     public boolean necesitaAbastecimiento() {
         return stock < cantidadMinima;
     }

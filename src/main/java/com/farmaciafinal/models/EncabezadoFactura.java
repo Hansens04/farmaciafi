@@ -1,6 +1,7 @@
 package com.farmaciafinal.models;
 
 public class EncabezadoFactura {
+    //Atributos
     private Cliente cliente;
     private Producto producto;
     private int cantidad;
@@ -25,9 +26,12 @@ public class EncabezadoFactura {
         this.id = id;
     }
 
+    //Metodo para calcular el total de la factura
     private double calcularTotal(double precio, int cantidad) {
         return precio * cantidad;
     }
+
+    //Metodo para modificar a la factura
     public void actualizar(Cliente cliente, Producto producto, int cantidad, double total,String id) {
         this.cliente = cliente;
         this.producto = producto;

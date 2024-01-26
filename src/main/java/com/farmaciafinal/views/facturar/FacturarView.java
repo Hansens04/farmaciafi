@@ -1,5 +1,6 @@
 package com.farmaciafinal.views.facturar;
 
+// Importaciones de clases y utilidades necesarias
 import com.farmaciafinal.models.Cliente;
 import com.farmaciafinal.models.EncabezadoFactura;
 import com.farmaciafinal.models.Producto;
@@ -26,9 +27,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
+// Define el título de la página y la ruta para esta vista
 @PageTitle("Facturar")
 @Route(value = "facturar", layout = MainLayout.class)
 public class FacturarView extends Composite<VerticalLayout> {
+    // Declaración de componentes de la interfaz de usuario
     VerticalLayout layoutColumn2 = new VerticalLayout();
     H3 h3 = new H3();
     FormLayout formLayout2Col = new FormLayout();
@@ -40,12 +43,14 @@ public class FacturarView extends Composite<VerticalLayout> {
     HorizontalLayout layoutRow = new HorizontalLayout();
     Button guardar = new Button("Guardar");
     Button cancelar = new Button("Cancelar");
-
     Grid<EncabezadoFactura> grid = new Grid<>(EncabezadoFactura.class, false);
 
+    // Variable para mantener el encabezado de factura en edición
     private EncabezadoFactura encabezadoFacturaEnEdicion;
 
+    // Constructor de la vista
     public FacturarView() {
+        // Configuración de diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(FlexComponent.JustifyContentMode.START);
@@ -64,7 +69,9 @@ public class FacturarView extends Composite<VerticalLayout> {
         layoutRow.setWidth("100%");
         layoutRow.getStyle().set("flex-grow", "1");
         guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        cancelar.setWidth("min-content");
 
+        // Configuración de eventos y comportamiento de los botones
         guardar.addClickListener(e -> {
             Cliente clienteSeleccionado = clienteComboBox.getValue();
             Producto productoSeleccionado = productoComboBox.getValue();
@@ -105,7 +112,6 @@ public class FacturarView extends Composite<VerticalLayout> {
             Notification.show("Factura guardada exitosamente", 3000, Notification.Position.MIDDLE);
         });
 
-        cancelar.setWidth("min-content");
         cancelar.addClickListener(e -> {
             // Borrar todos los datos de los ComboBox y NumberField
             clienteComboBox.clear();
@@ -117,8 +123,7 @@ public class FacturarView extends Composite<VerticalLayout> {
             Notification.show("Operación cancelada", 3000, Notification.Position.MIDDLE);
         });
 
-        getContent().add(layoutColumn2);
-
+        // Añadir componentes al layoutColumn2
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
         formLayout2Col.add(clienteComboBox);
@@ -153,13 +158,16 @@ public class FacturarView extends Composite<VerticalLayout> {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         layoutColumn2.add(grid);
 
+        // Añadir el layoutColumn2 al contenido de la vista
         getContent().add(layoutColumn2);
     }
 
+    // Método privado para calcular el total de una factura
     private double calcularTotal(double precio, int cantidad) {
         return precio * cantidad;
     }
 
+    // Método privado para editar una factura existente
     private void editarFactura(EncabezadoFactura encabezadoFactura) {
         encabezadoFacturaEnEdicion = encabezadoFactura;
         guardar.setText("Actualizar");
@@ -170,9 +178,19 @@ public class FacturarView extends Composite<VerticalLayout> {
         id.setValue(encabezadoFactura.getId());
     }
 
+    // Método privado para borrar una factura existente
     private void borrarFactura(EncabezadoFactura encabezadoFactura) {
         Utils.listaEncabezadoFactura.remove(encabezadoFactura);
         grid.setItems(Utils.listaEncabezadoFactura);
         Notification.show("Factura borrada exitosamente", 3000, Notification.Position.MIDDLE);
+    }
+
+    // Método para calcular el total de las ventas
+    public double calcularTotalVentas() {
+        double totalVentas = 0;
+        for (EncabezadoFactura factura : Utils.listaEncabezadoFactura) {
+            totalVentas += factura.getTotal();
+        }
+        return totalVentas;
     }
 }

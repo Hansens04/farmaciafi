@@ -33,6 +33,7 @@ import java.util.Arrays;
 @PageTitle("Realizar Pedido")
 @Route(value = "realizar-pedido", layout = MainLayout.class)
 public class RealizarPedidoView extends Composite<VerticalLayout> {
+    // Componentes de la interfaz de usuario
     private final VerticalLayout layoutColumn2 = new VerticalLayout();
     private final H3 h3 = new H3("Realizar Pedido");
     private final FormLayout formLayout2Col = new FormLayout();
@@ -51,7 +52,9 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
 
     private EncabezadoPedido encabezadoPedidoEnEdicion;
 
+    // Constructor de la vista
     public RealizarPedidoView() {
+        // Configuración del diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(FlexComponent.JustifyContentMode.START);
@@ -82,44 +85,17 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         formLayout2Col.add(fechaEnvioPicker);
 
         guardar.addClickListener(e -> {
-            Proveedor proveedorSeleccionado = proveedorComboBox.getValue();
-            Producto productoSeleccionado = productoComboBox.getValue();
-            int cantidad = cantidadF.getValue().intValue();
-            String id = idPedido.getValue();
-            String estadoPedido = estadoComboBox.getValue();
-            LocalDate fechaEnvio = fechaEnvioPicker.getValue();
-
-            // Calcular el total
-            double total = calcularTotal(productoSeleccionado.getPrecio(), cantidad);
-            totalField.setValue(total);
-
-            // Actualizar encabezado existente o agregar nuevo encabezado a la lista
-            if (encabezadoPedidoEnEdicion != null) {
-                // Si existe un encabezado en edición, actualiza sus propiedades
-                encabezadoPedidoEnEdicion.actualizar(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido, fechaEnvio);
-            } else {
-                // Si no existe, agrega un nuevo encabezado a la lista
-                EncabezadoPedido nuevoEncabezado = new EncabezadoPedido(productoSeleccionado,cantidad,total,id,proveedorSeleccionado,estadoPedido,fechaEnvio);
-
-                Utils.listaEncabezadoPedido.add(nuevoEncabezado);
-                encabezadoPedidoEnEdicion = nuevoEncabezado;  // Actualiza la referencia al encabezado en edición
-            }
-
-            // Luego, llama al método actualizar con los parámetros
-            encabezadoPedidoEnEdicion.actualizar(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido, fechaEnvio);
-
-            // Actualiza el Grid y limpia los campos
-            actualizarGridYLimpiarCampos();
-
-            Notification.show("Pedido guardado exitosamente", 3000, Notification.Position.MIDDLE);
+            // Método invocado al hacer clic en el botón "Guardar"
+            guardarPedido();
         });
 
         cancelar.setWidth("min-content");
         cancelar.addClickListener(e -> {
-            limpiarCampos();
-            Notification.show("Operación cancelada", 3000, Notification.Position.MIDDLE);
+            // Método invocado al hacer clic en el botón "Cancelar"
+            cancelarPedido();
         });
 
+        // Agregar componentes al diseño
         getContent().add(layoutColumn2);
 
         layoutColumn2.add(h3);
@@ -162,12 +138,56 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         getContent().add(layoutColumn2);
     }
 
+    // Método para calcular el total del pedido
     private double calcularTotal(double precio, int cantidad) {
         return precio * cantidad;
     }
 
+    // Método para guardar un pedido
+    private void guardarPedido() {
+        // Obtener los valores de los campos de entrada
+        Proveedor proveedorSeleccionado = proveedorComboBox.getValue();
+        Producto productoSeleccionado = productoComboBox.getValue();
+        int cantidad = cantidadF.getValue().intValue();
+        String id = idPedido.getValue();
+        String estadoPedido = estadoComboBox.getValue();
+        LocalDate fechaEnvio = fechaEnvioPicker.getValue();
+
+        // Calcular el total del pedido
+        double total = calcularTotal(productoSeleccionado.getPrecio(), cantidad);
+        totalField.setValue(total);
+
+        // Crear o actualizar el encabezado del pedido
+        if (encabezadoPedidoEnEdicion != null) {
+            encabezadoPedidoEnEdicion.actualizar(proveedorSeleccionado, productoSeleccionado, cantidad, total, id, estadoPedido, fechaEnvio);
+        } else {
+            EncabezadoPedido nuevoEncabezado = new EncabezadoPedido(productoSeleccionado, cantidad, total, id, proveedorSeleccionado, estadoPedido, fechaEnvio);
+            Utils.listaEncabezadoPedido.add(nuevoEncabezado);
+            encabezadoPedidoEnEdicion = nuevoEncabezado;
+        }
+
+        // Actualizar el grid y limpiar los campos
+        actualizarGridYLimpiarCampos();
+
+        // Mostrar una notificación de éxito
+        Notification.show("Pedido guardado exitosamente", 3000, Notification.Position.MIDDLE);
+    }
+
+    // Método para cancelar un pedido
+    private void cancelarPedido() {
+        // Limpiar los campos
+        limpiarCampos();
+
+        // Mostrar una notificación de cancelación
+        Notification.show("Operación cancelada", 3000, Notification.Position.MIDDLE);
+    }
+
+    // Método para editar un pedido
     private void editarPedido(EncabezadoPedido encabezadoPedido) {
+        // Establecer el pedido en edición
         encabezadoPedidoEnEdicion = encabezadoPedido;
+
+        // Establecer los valores de los campos de entrada con los valores del pedido seleccionado
         guardar.setText("Actualizar");
         proveedorComboBox.setValue(encabezadoPedido.getProveedor());
         productoComboBox.setValue(encabezadoPedido.getProducto());
@@ -178,20 +198,28 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         fechaEnvioPicker.setValue(encabezadoPedido.getFechaEnvio());
     }
 
+    // Método para borrar un pedido
     private void borrarPedido(EncabezadoPedido encabezadoPedido) {
+        // Remover el pedido de la lista
         Utils.listaEncabezadoPedido.remove(encabezadoPedido);
+
+        // Actualizar el grid
         grid.setItems(Utils.listaEncabezadoPedido);
+
+        // Mostrar una notificación de éxito
         Notification.show("Pedido borrado exitosamente", 3000, Notification.Position.MIDDLE);
     }
 
+    // Método para actualizar el grid y limpiar los campos
     private void actualizarGridYLimpiarCampos() {
-        // Actualiza el Grid
+        // Actualizar el grid
         grid.setItems(Utils.listaEncabezadoPedido);
 
-        // Limpiar los campos después de agregar al pedido
+        // Limpiar los campos
         limpiarCampos();
     }
 
+    // Método para limpiar los campos
     private void limpiarCampos() {
         proveedorComboBox.clear();
         productoComboBox.clear();
@@ -202,5 +230,14 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         fechaEnvioPicker.clear();
         encabezadoPedidoEnEdicion = null;
         guardar.setText("Guardar");
+    }
+
+    // Método para calcular el total de todas las compras
+    public double calcularTotalCompras() {
+        double totalCompras = 0;
+        for (EncabezadoPedido pedido : Utils.listaEncabezadoPedido) {
+            totalCompras += pedido.getTotal();
+        }
+        return totalCompras;
     }
 }

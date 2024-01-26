@@ -1,7 +1,6 @@
 package com.farmaciafinal.views.ingresarcliente;
 
 import com.farmaciafinal.models.Cliente;
-
 import com.farmaciafinal.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -20,18 +19,18 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-
-
 import java.util.List;
-
 import static com.farmaciafinal.utils.Utils.*;
 
+// Define el título de la página y la ruta para esta vista
 @PageTitle("Ingresar Cliente")
 @Route(value = "ingresar-cliente", layout = MainLayout.class)
 @Uses(Icon.class)
 public class IngresarClienteView extends Composite<VerticalLayout> {
+    // Declaración de componentes de la interfaz de usuario
     VerticalLayout layoutColumn2 = new VerticalLayout();
     H3 h3 = new H3();
     FormLayout formLayout2Col = new FormLayout();
@@ -39,19 +38,15 @@ public class IngresarClienteView extends Composite<VerticalLayout> {
     TextField telefonoCliente = new TextField();
     TextField direccionCliente = new TextField();
     TextField cedula = new TextField();
-
     HorizontalLayout layoutRow = new HorizontalLayout();
     Button guardar = new Button();
     Button cancelar = new Button();
-
-   Cliente clienteEditar;
-
-    String nombrecl, cedulaCliente, direccioncl;
-    String telefonocl;
-
     Grid<Cliente> grid = new Grid<>(Cliente.class, false);
-    public IngresarClienteView() {
+    Cliente clienteEditar;
 
+    // Constructor de la vista
+    public IngresarClienteView() {
+        // Configuración de diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(JustifyContentMode.START);
@@ -74,123 +69,93 @@ public class IngresarClienteView extends Composite<VerticalLayout> {
         guardar.setText("Save");
         guardar.setWidth("min-content");
         guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        // Lógica para guardar un cliente
         guardar.addClickListener(e -> {
             // Obtener los valores de los campos
-            nombrecl = nombreCliente.getValue();
+            String nombreCliente = this.nombreCliente.getValue();
+            String telefonoCliente = this.telefonoCliente.getValue();
+            String cedulaCliente = this.cedula.getValue();
+            String direccionCliente = this.direccionCliente.getValue();
 
-
-            // ¡Asegúrate de inicializar 'precioProducto' antes de usarlo!
-            try {
-                telefonocl = telefonoCliente.getValue();
-            } catch (NumberFormatException ex) {
-                Notification.show("Error: El precio debe ser un número válido");
-                return; // Salir del método si el precio no es válido
+            // Validar campos obligatorios
+            if (cedulaCliente.isEmpty()) {
+                Notification.show("Debe ingresar la cedula del cliente", 3000, Notification.Position.MIDDLE);
+                return;
             }
 
-            direccioncl = direccionCliente.getValue();
-            cedulaCliente = cedula.getValue();
-            Cliente cliente = new Cliente(nombrecl, cedulaCliente,telefonocl, direccioncl);
-            // Agregar el producto a la lista de productos
+            // Crear un nuevo objeto Cliente
+            Cliente cliente = new Cliente(nombreCliente, cedulaCliente, telefonoCliente, direccionCliente);
+
+            // Agregar el cliente a la lista de clientes
             listaCliente.add(cliente);
 
-            // Actualizar el DataProvider del Grid
+            // Actualizar el grid con la lista de clientes
             grid.setItems(listaCliente);
+
+            // Limpiar campos después de guardar
+            limpiarCampos();
         });
 
         cancelar.setText("Cancel");
         cancelar.setWidth("min-content");
-        cancelar.addClickListener(e -> {
-            // Borrar todos los datos de los TextField
-            nombreCliente.clear();
-            telefonoCliente.clear();
-            cedula.clear();
+        cancelar.addClickListener(e -> limpiarCampos());
 
-            // Puedes agregar más líneas según la cantidad de TextField que tengas
-
-            guardar.getUI().ifPresent(ui ->
-                    ui.getPage().reload()); // Puedes usar reload() para recargar la página si es necesario
-        });
-
-
+        // Agregar componentes al diseño
         getContent().add(layoutColumn2);
-
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
-        formLayout2Col.add(nombreCliente);
-        formLayout2Col.add(telefonoCliente);
-        formLayout2Col.add(cedula);
-        formLayout2Col.add(direccionCliente);
+        formLayout2Col.add(nombreCliente, telefonoCliente, cedula, direccionCliente);
         layoutColumn2.add(layoutRow);
-        layoutRow.add(guardar);
-        layoutRow.add(cancelar);
-        VerticalLayout layoutColumn2 = new VerticalLayout();
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
-        layoutColumn2.setWidth("100%");
-        layoutColumn2.getStyle().set("flex-grow", "1");
+        layoutRow.add(guardar, cancelar);
+        layoutColumn2.add(grid);
 
+        // Configuración de columnas en el grid
         grid.addColumn(Cliente::getCedula).setHeader("Cedula").setAutoWidth(true);
         grid.addColumn(Cliente::getNombre).setHeader("Nombre Cliente").setAutoWidth(true);
         grid.addColumn(Cliente::getTelefono).setHeader("Telefono").setAutoWidth(true);
         grid.addColumn(Cliente::getDireccion).setHeader("Direccion").setAutoWidth(true);
-        grid.addColumn(
-                new ComponentRenderer<>(cliente -> {
-                    Button botonBorrar = new Button();
-                    botonBorrar.addThemeVariants(ButtonVariant.LUMO_ERROR);
-                    botonBorrar.addClickListener(e -> {
-                        listaCliente.remove(cliente);
-                        grid.getDataProvider().refreshAll();
-                    });
-                    botonBorrar.setIcon(new Icon(VaadinIcon.TRASH));
+        grid.addColumn(new ComponentRenderer<>(cliente -> {
+            // Botón para borrar un cliente
+            Button botonBorrar = new Button();
+            botonBorrar.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            botonBorrar.addClickListener(event -> {
+                listaCliente.remove(cliente);
+                grid.getDataProvider().refreshAll();
+            });
+            botonBorrar.setIcon(new Icon(VaadinIcon.TRASH));
 
-                    Button botonEditar = new Button();
-                    botonEditar.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-                    botonEditar.addClickListener(e -> {
-                        // Verificar si el código del producto ya existe (assumiendo que productoEditar es una instancia válida)
-                        if (productoYaExiste(cedula.getValue())) {
-                            nombreCliente.setReadOnly(false);
-                            telefonoCliente.setReadOnly(false);
-                            cedula.setReadOnly(false);
-                            // Realizar la lógica de edición según el tipo de producto
-                            clienteEditar.setNombre(nombrecl);
-                            clienteEditar.setDireccion(direccioncl);
+            // Botón para editar un cliente
+            Button botonEditar = new Button();
+            botonEditar.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+            botonEditar.addClickListener(event -> {
+                // Asignar el cliente a editar y mostrar los detalles en los campos de texto
+                clienteEditar = cliente;
+                this.nombreCliente.setValue(cliente.getNombre());
+                this.telefonoCliente.setValue(cliente.getTelefono());
+                this.cedula.setValue(cliente.getCedula());
+                this.direccionCliente.setValue(cliente.getDireccion());
+                guardar.setText("Update");
+            });
+            botonEditar.setIcon(new Icon(VaadinIcon.EDIT));
 
-                            clienteEditar.setTelefono(telefonocl);
-                            clienteEditar.setCedula(cedulaCliente);
-                            clienteEditar.setDireccion(String.valueOf(direccionCliente));
-                            guardar.addClickListener(guardarEvent -> {
-                                // Lógica para guardar los datos (reemplaza esto con tu lógica real)
-                                grid.setItems(clienteEditar);
-                            });
+            // Diseño horizontal para los botones de acción
+            HorizontalLayout buttons = new HorizontalLayout(botonBorrar, botonEditar);
+            return buttons;
+        })).setHeader("Manage").setAutoWidth(true);
 
-                        }});
-                    botonEditar.setIcon(new Icon(VaadinIcon.EDIT));
-
-
-
-
-                    HorizontalLayout buttons = new HorizontalLayout(botonBorrar,botonEditar);
-                    return buttons;
-                })).setHeader("Manage").setAutoWidth(true);
-
-
-        List<Cliente> clientes = listaCliente;
-        grid.setItems(clientes);
+        // Mostrar la lista de clientes en el grid
+        grid.setItems(listaCliente);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        layoutColumn2.add(guardar,grid);
-
-
-        getContent().add(layoutColumn2);
-    }
-    // Método para verificar si el código del producto ya existe
-    private boolean productoYaExiste(String codigoProducto) {
-        // Supongamos que tienes una lista llamada "listaProductos" que contiene objetos Producto
-
-        // Verificar si algún producto en la lista tiene el mismo código
-        return listaProdcuto.stream()
-                .anyMatch(producto -> producto.getIdProducto().equals(codigoProducto));
     }
 
-
-
+    // Método para limpiar los campos de texto después de guardar o cancelar
+    private void limpiarCampos() {
+        nombreCliente.clear();
+        telefonoCliente.clear();
+        cedula.clear();
+        direccionCliente.clear();
+        guardar.setText("Save");
+        clienteEditar = null;
+    }
 }

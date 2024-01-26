@@ -4,13 +4,16 @@ import java.util.List;
 
 public class Cliente {
 
+    //Atributos de clase
     private String nombre;
     private String cedula;
     private String telefono;
     private String direccion;
 
+    //Almecenar dato para encabezado de factura
     private final List<EncabezadoFactura> encabezadoFacturas = new ArrayList<>();
 
+    //Constructor
     public Cliente(String nombre, String cedula, String telefono, String direccion) {
         validarDatosEntrada(nombre, cedula, telefono);
         this.nombre = nombre;
@@ -21,7 +24,7 @@ public class Cliente {
 
 
 
-
+    //Validación de datos que no sean nulos o vacios
     private void validarDatosEntrada(String nombre, String cedula, String telefono) {
         if (nombre == null || nombre.isEmpty() || cedula == null || cedula.isEmpty() || telefono == null || telefono.isEmpty()) {
             throw new IllegalArgumentException("Los datos de entrada no pueden ser nulos o vacíos.");
@@ -69,8 +72,4 @@ public class Cliente {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-
-
-
-    // Otros métodos y clases relacionadas con EncabezadoFactura y cualquier otro código adicional.
 }

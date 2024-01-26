@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class Proveedor{
+    //Atributos
     private String nombreProveedor;
     private String telefonoProveedor;
     private String codigo;
@@ -13,21 +14,18 @@ public class Proveedor{
     private List<EncabezadoPedido> encabezadoP;
     private Fecha fecha;
 
+    //Constructor 
     public Proveedor(String nombreProveedor, String telefonoProveedor,String codigo,String direccion, List<String> producto) {
         this.nombreProveedor = nombreProveedor;
         this.telefonoProveedor = telefonoProveedor;
         this.codigo=codigo;
         this.direccion=direccion;
         this.listaProductos = producto;
-    }//que permita los cambios de cambiar o eliminar productos.
-    //metodo de Agregar productos a la clase y metodo buscar
-    //se puede utilizar el remover
-    // no se puede eliminar una lista de pedidos o productos
+    }
+
+
     public String getNombreProveedor() {
         return nombreProveedor;
-    }
-    public List<String> getListaProductos() {
-        return listaProductos;
     }
 
     public void setNombreProveedor(String nombreProveedor) {
@@ -66,5 +64,3 @@ public class Proveedor{
 
 
 }
-
-//consulta cuantos pedidos le he hecho al proveedor, cual es total a pagar de un proveedor, cuantos pedidos se le ha hecho desde cierta fecha...

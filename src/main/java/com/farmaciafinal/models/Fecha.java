@@ -4,9 +4,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class Fecha {
+    //Atributos
     private int dia;
     private int mes;
     private int anio;
+
+    //Constructor
     public Fecha(int dia, int mes, int anio){
         this.dia=dia;
         this.mes=mes;
@@ -36,6 +39,8 @@ public class Fecha {
     public void setAnio(int anio) {
         this.anio = anio;
     }
+
+    //Metodo para la fecha actual, se le debe adjuntar su libreria
     public void darFechaActual(){
         GregorianCalendar gc = new GregorianCalendar();
         dia=gc.get(Calendar.DAY_OF_MONTH);

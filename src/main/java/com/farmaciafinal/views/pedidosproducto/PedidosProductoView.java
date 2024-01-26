@@ -17,10 +17,13 @@ import java.util.stream.Collectors;
 @PageTitle("Pedidos Producto")
 @Route(value = "pedidos-producto", layout = MainLayout.class)
 public class PedidosProductoView extends Composite<VerticalLayout> {
+    // Declaración de componentes de la interfaz de usuario
     private Select<Producto> productoSelect;
     private Grid<EncabezadoPedido> grid;
 
+    // Constructor de la vista
     public PedidosProductoView() {
+        // Configuración de diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
 
@@ -41,6 +44,7 @@ public class PedidosProductoView extends Composite<VerticalLayout> {
         getContent().add(productoSelect, grid);
     }
 
+    // Método para buscar pedidos por producto
     private void buscarPedidosPorProducto(Producto productoSeleccionado) {
         if (productoSeleccionado == null) {
             // Si no se ha seleccionado ningún producto, limpiar el grid

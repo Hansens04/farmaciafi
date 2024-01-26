@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EncabezadoPedido {
+    //Atributos
     private Producto producto;
     private int cantidad;
     private double total;
@@ -13,6 +14,7 @@ public class EncabezadoPedido {
     private Proveedor proveedor;
     private LocalDate fechaEnvio;
 
+    //Constructor
     public EncabezadoPedido(Producto producto, int cantidad, double total, String id, Proveedor proveedor,String estadodelpedido, LocalDate fechaEnvio) {
         this.producto = producto;
         this.cantidad = cantidad;
@@ -23,7 +25,6 @@ public class EncabezadoPedido {
         this.fechaEnvio = fechaEnvio;
     }
 
-    // ... (resto de la clase)
 
     public String getEstado() {
         return estado;
@@ -39,8 +40,9 @@ public class EncabezadoPedido {
 
     private List<DetallePedido> detalleP;
 
+    //Metodo para modificar el encabezado del pedido
     public void actualizar(Proveedor proveedor, Producto producto, int cantidad, double total, String id, String estado, LocalDate fechaEnvio) {
-        this.proveedor = proveedor; // Update this line
+        this.proveedor = proveedor; 
         this.producto = producto;
         this.cantidad = cantidad;
         this.total = total;
@@ -78,7 +80,7 @@ public class EncabezadoPedido {
         return detalleP;
     }
 
-
+    //Metodo para consultar el total de pedidos del proveedor
     public static void consultarTotalPedidosProveedor(EncabezadoPedido encabezadoPedido, Proveedor proveedor) {
         System.out.println("Consulta total de pedidos para el proveedor " + proveedor.getNombreProveedor() + ":");
 
@@ -87,7 +89,6 @@ public class EncabezadoPedido {
                 System.out.println("Pedido #" + encabezadoPedido.getCodigoPedido() +
                         " - Producto: " + detalle.darProducto().getNombreProducto() +
                         " - Total: " + detalle.calcularTotal());
-                // Agrega más información según sea necesario
             }
         }
     }

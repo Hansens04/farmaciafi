@@ -13,20 +13,18 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.theme.lumo.LumoUtility;
-
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static com.farmaciafinal.utils.Utils.listaProdcuto;
 import static com.farmaciafinal.utils.Utils.listaProveedores;
 
 @PageTitle("Ingresar Proveedor")
@@ -34,6 +32,7 @@ import static com.farmaciafinal.utils.Utils.listaProveedores;
 @RouteAlias(value = "", layout = MainLayout.class)
 @Uses(Icon.class)
 public class IngresarProveedorView extends Composite<VerticalLayout> {
+    // Declaración de componentes de la interfaz de usuario
     VerticalLayout layoutColumn2 = new VerticalLayout();
     H3 h3 = new H3();
     FormLayout formLayout2Col = new FormLayout();
@@ -41,23 +40,20 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
     TextField telefono = new TextField();
     TextField direccion = new TextField();
     TextField codigo = new TextField();
-
     HorizontalLayout layoutRow = new HorizontalLayout();
     Button guardar = new Button();
     Button cancelar = new Button();
-
-    Proveedor proveedorEditar;
-
-    String nombreProve, codigoProveedor, direccionProveedor;
-    String telefonoP;
-    List<String> listaproducto =new ArrayList<>();
-
     Grid<Proveedor> grid = new Grid<>(Proveedor.class, false);
+    Proveedor proveedorEditar;
+    boolean modoEdicion = false;
+
+    // Constructor de la vista
     public IngresarProveedorView() {
+        // Configuración de diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
-        getContent().setJustifyContentMode(JustifyContentMode.START);
-        getContent().setAlignItems(Alignment.CENTER);
+        getContent().setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        getContent().setAlignItems(FlexComponent.Alignment.CENTER);
         layoutColumn2.setWidth("100%");
         layoutColumn2.setMaxWidth("800px");
         layoutColumn2.setHeight("min-content");
@@ -68,130 +64,193 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
         telefono.setLabel("Telefono Proveedor");
         codigo.setLabel("Código");
         direccion.setLabel("Direccion");
-        codigo.setRequired(true);
-        codigo.setErrorMessage("Debe ingresar el código del proveedor");
-        layoutRow.addClassName(LumoUtility.Gap.MEDIUM);
+        layoutRow.addClassName("gap-m");
         layoutRow.setWidth("100%");
         layoutRow.getStyle().set("flex-grow", "1");
         guardar.setText("Save");
         guardar.setWidth("min-content");
         guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        // Lógica para guardar un nuevo proveedor o actualizar uno existente
         guardar.addClickListener(e -> {
-            // Obtener los valores de los campos
-            nombreProve = nombreProveedor.getValue();
-
-
-            // ¡Asegúrate de inicializar 'precioProducto' antes de usarlo!
-            try {
-                telefonoP = telefono.getValue();
-            } catch (NumberFormatException ex) {
-                Notification.show("Error: El precio debe ser un número válido");
-                return; // Salir del método si el precio no es válido
+            if (modoEdicion) {
+                guardarEdicion();
+            } else {
+                guardarNuevoProveedor();
             }
-
-            direccionProveedor = direccion.getValue();
-            codigoProveedor = codigo.getValue();
-            Proveedor proveedor = new Proveedor(nombreProve,telefonoP,codigoProveedor,direccionProveedor,listaproducto);
-            // Agregar el producto a la lista de productos
-            listaProveedores.add(proveedor);
-
-            // Actualizar el DataProvider del Grid
-            grid.setItems(listaProveedores);
         });
 
+        // Configuración del botón de cancelar
         cancelar.setText("Cancel");
         cancelar.setWidth("min-content");
         cancelar.addClickListener(e -> {
-            // Borrar todos los datos de los TextField
-            nombreProveedor.clear();
-            telefono.clear();
-            codigo.clear();
-
-            // Puedes agregar más líneas según la cantidad de TextField que tengas
-
-            guardar.getUI().ifPresent(ui ->
-                    ui.getPage().reload()); // Puedes usar reload() para recargar la página si es necesario
+            limpiarCampos();
+            if (modoEdicion) {
+                modoEdicion = false;
+                cancelarEdicion();
+            }
         });
 
-
+        // Agregar componentes al diseño
         getContent().add(layoutColumn2);
-
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
-        formLayout2Col.add(nombreProveedor);
-        formLayout2Col.add(telefono);
-        formLayout2Col.add(codigo);
-        formLayout2Col.add(direccion);
+        formLayout2Col.add(nombreProveedor, telefono, codigo, direccion);
         layoutColumn2.add(layoutRow);
         layoutRow.add(guardar);
         layoutRow.add(cancelar);
-        VerticalLayout layoutColumn2 = new VerticalLayout();
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
-        layoutColumn2.setWidth("100%");
-        layoutColumn2.getStyle().set("flex-grow", "1");
+        layoutColumn2.add(grid);
 
+        // Configuración de columnas en el grid
         grid.addColumn(Proveedor::getCodigo).setHeader("Código").setAutoWidth(true);
         grid.addColumn(Proveedor::getNombreProveedor).setHeader("Nombre Proveedor").setAutoWidth(true);
         grid.addColumn(Proveedor::getTelefonoProveedor).setHeader("Telefono").setAutoWidth(true);
         grid.addColumn(Proveedor::getDireccion).setHeader("Direccion").setAutoWidth(true);
-        grid.addColumn(
-                new ComponentRenderer<>(proveedor -> {
-                    Button botonBorrar = new Button();
-                    botonBorrar.addThemeVariants(ButtonVariant.LUMO_ERROR);
-                    botonBorrar.addClickListener(e -> {
-                        listaProveedores.remove(proveedor);
-                        grid.getDataProvider().refreshAll();
-                    });
-                    botonBorrar.setIcon(new Icon(VaadinIcon.TRASH));
+        grid.addColumn(new ComponentRenderer<>(proveedor -> {
+            // Botón para borrar un proveedor
+            Button botonBorrar = new Button();
+            botonBorrar.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            botonBorrar.addClickListener(event -> {
+                listaProveedores.remove(proveedor);
+                grid.getDataProvider().refreshAll();
+            });
+            botonBorrar.setIcon(new Icon(VaadinIcon.TRASH));
 
-                    Button botonEditar = new Button();
-                    botonEditar.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-                    botonEditar.addClickListener(e -> {
-                        // Verificar si el código del producto ya existe (assumiendo que productoEditar es una instancia válida)
-                        if (productoYaExiste(codigo.getValue())) {
-                            nombreProveedor.setReadOnly(false);
-                            telefono.setReadOnly(false);
-                            codigo.setReadOnly(true);
-                            // Realizar la lógica de edición según el tipo de producto
-                            proveedorEditar.setNombreProveedor(nombreProve);
-                            proveedorEditar.setDireccion(direccionProveedor);
+            // Botón para editar un proveedor
+            Button botonEditar = new Button();
+            botonEditar.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+            botonEditar.addClickListener(event -> editarProveedor(proveedor));
+            botonEditar.setIcon(new Icon(VaadinIcon.EDIT));
 
-                            proveedorEditar.setTelefonoProveedor(telefonoP);
-                            proveedorEditar.setDireccion(String.valueOf(direccion));
-                            guardar.addClickListener(guardarEvent -> {
-                                // Lógica para guardar los datos (reemplaza esto con tu lógica real)
-                                grid.setItems(proveedorEditar);
-                            });
+            // Diseño horizontal para los botones de acción
+            HorizontalLayout buttons = new HorizontalLayout(botonBorrar, botonEditar);
+            return buttons;
+        })).setHeader("Manage").setAutoWidth(true);
 
-                        }});
-                    botonEditar.setIcon(new Icon(VaadinIcon.EDIT));
-
-
-
-
-                    HorizontalLayout buttons = new HorizontalLayout(botonBorrar,botonEditar);
-                    return buttons;
-                })).setHeader("Manage").setAutoWidth(true);
-
-
-        List<Proveedor> proveedors = listaProveedores;
-        grid.setItems(proveedors);
+        // Configuración de la lista de proveedores en el grid
+        grid.setItems(listaProveedores);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        layoutColumn2.add(guardar,grid);
-
-
-        getContent().add(layoutColumn2);
-    }
-    // Método para verificar si el código del producto ya existe
-    private boolean productoYaExiste(String codigoProducto) {
-        // Supongamos que tienes una lista llamada "listaProductos" que contiene objetos Producto
-
-        // Verificar si algún producto en la lista tiene el mismo código
-        return listaProdcuto.stream()
-                .anyMatch(producto -> producto.getIdProducto().equals(codigoProducto));
     }
 
+    // Método para guardar un nuevo proveedor
+    private void guardarNuevoProveedor() {
+        String nombreProve = nombreProveedor.getValue();
+        String telefonoP = telefono.getValue();
+        String direccionProveedor = direccion.getValue();
+        String codigoProveedor = codigo.getValue();
 
+        // Verificar que todos los campos estén completos
+        if (nombreProve.isEmpty() || telefonoP.isEmpty() || direccionProveedor.isEmpty() || codigoProveedor.isEmpty()) {
+            Notification.show("Error: Todos los campos son obligatorios.");
+            return;
+        }
 
+        // Validar si el código del proveedor ya existe
+        if (codigoProveedorExistente(codigoProveedor)) {
+            Notification.show("Error: El código del proveedor ya existe.");
+            return;
+        }
+
+        // Validar formato del teléfono (solo números)
+        if (!esNumero(telefonoP)) {
+            Notification.show("Error: El teléfono debe contener solo números.");
+            return;
+        }
+
+        // Validar formato del código (solo números)
+        if (!esNumero(codigoProveedor)) {
+            Notification.show("Error: El código debe contener solo números.");
+            return;
+        }
+
+        Proveedor proveedor = new Proveedor(nombreProve, telefonoP, codigoProveedor, direccionProveedor, new ArrayList<>());
+        listaProveedores.add(proveedor);
+
+        grid.setItems(listaProveedores);
+
+        limpiarCampos();
+    }
+
+    // Método para verificar si el código del proveedor ya existe
+    private boolean codigoProveedorExistente(String codigoProveedor) {
+        // Verificar si el código del proveedor ya existe en la lista de proveedores
+        return listaProveedores.stream().anyMatch(proveedor -> proveedor.getCodigo().equals(codigoProveedor));
+    }
+
+    // Método para verificar si una cadena contiene solo números
+    private boolean esNumero(String cadena) {
+        // Verifica si la cadena solo contiene números
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(cadena);
+        return matcher.matches();
+    }
+
+    // Método para editar un proveedor
+    private void editarProveedor(Proveedor proveedor) {
+        proveedorEditar = proveedor;
+        modoEdicion = true;
+
+        // Asignar valores del proveedor a los campos de texto
+        nombreProveedor.setValue(proveedor.getNombreProveedor());
+        telefono.setValue(proveedor.getTelefonoProveedor());
+        direccion.setValue(proveedor.getDireccion());
+        codigo.setValue(proveedor.getCodigo());
+
+        // Cambiar texto del botón guardar y remover el botón de cancelar
+        guardar.setText("Update");
+        guardar.removeThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        guardar.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        layoutRow.remove(cancelar);
+    }
+
+    // Método para guardar la edición de un proveedor
+    private void guardarEdicion() {
+        String nombreProve = nombreProveedor.getValue();
+        String telefonoP = telefono.getValue();
+        String direccionProveedor = direccion.getValue();
+
+        // Verificar que todos los campos estén completos
+        if (nombreProve.isEmpty() || telefonoP.isEmpty() || direccionProveedor.isEmpty()) {
+            Notification.show("Error: Todos los campos son obligatorios.");
+            return;
+        }
+
+        // Actualizar los datos del proveedor
+        proveedorEditar.setNombreProveedor(nombreProve);
+        proveedorEditar.setTelefonoProveedor(telefonoP);
+        proveedorEditar.setDireccion(direccionProveedor);
+
+        // Remover el proveedor antiguo y agregar el proveedor actualizado
+        listaProveedores.remove(proveedorEditar);
+        listaProveedores.add(proveedorEditar);
+
+        // Actualizar el Grid con la lista actualizada de proveedores
+        grid.setItems(listaProveedores);
+
+        // Limpiar los campos y volver al modo de edición
+        limpiarCampos();
+        modoEdicion = false;
+        guardar.setText("Save");
+        guardar.removeThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        layoutRow.add(cancelar);
+    }
+
+    // Método para cancelar la edición de un proveedor
+    private void cancelarEdicion() {
+        limpiarCampos();
+        modoEdicion = false;
+        guardar.setText("Save");
+        guardar.removeThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        layoutRow.add(cancelar);
+    }
+
+    // Método para limpiar los campos de texto
+    private void limpiarCampos() {
+        nombreProveedor.clear();
+        telefono.clear();
+        direccion.clear();
+        codigo.clear();
+    }
 }
