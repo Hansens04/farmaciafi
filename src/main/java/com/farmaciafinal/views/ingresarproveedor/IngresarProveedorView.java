@@ -1,6 +1,8 @@
 package com.farmaciafinal.views.ingresarproveedor;
 
+import com.farmaciafinal.models.Producto;
 import com.farmaciafinal.models.Proveedor;
+import com.farmaciafinal.utils.Utils;
 import com.farmaciafinal.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -17,6 +19,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.*;
 
@@ -46,6 +49,7 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
     Grid<Proveedor> grid = new Grid<>(Proveedor.class, false);
     Proveedor proveedorEditar;
     boolean modoEdicion = false;
+    private ComboBox<Producto> productoComboBox = new ComboBox<>("Seleccione un producto");
 
     // Constructor de la vista
     public IngresarProveedorView() {
@@ -71,6 +75,10 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
         guardar.setWidth("min-content");
         guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
+        // Agregar los productos al ComboBox
+        productoComboBox.setItems(Utils.listaProdcuto);
+        productoComboBox.setItemLabelGenerator(Producto::getNombreProducto);
+
         // Lógica para guardar un nuevo proveedor o actualizar uno existente
         guardar.addClickListener(e -> {
             if (modoEdicion) {
@@ -95,7 +103,7 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
-        formLayout2Col.add(nombreProveedor, telefono, codigo, direccion);
+        formLayout2Col.add(nombreProveedor, telefono, codigo, direccion, productoComboBox);
         layoutColumn2.add(layoutRow);
         layoutRow.add(guardar);
         layoutRow.add(cancelar);
@@ -163,6 +171,12 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
             return;
         }
 
+        // Validar que el nombre contenga solo letras
+        if (!contieneSoloLetras(nombreProve)) {
+            Notification.show("Error: El nombre del proveedor debe contener solo letras.");
+            return;
+        }
+
         Proveedor proveedor = new Proveedor(nombreProve, telefonoP, codigoProveedor, direccionProveedor, new ArrayList<>());
         listaProveedores.add(proveedor);
 
@@ -181,6 +195,14 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
     private boolean esNumero(String cadena) {
         // Verifica si la cadena solo contiene números
         Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(cadena);
+        return matcher.matches();
+    }
+
+    // Método para verificar si una cadena contiene solo letras
+    private boolean contieneSoloLetras(String cadena) {
+        // Verifica si la cadena solo contiene letras
+        Pattern pattern = Pattern.compile("[a-zA-Z]+");
         Matcher matcher = pattern.matcher(cadena);
         return matcher.matches();
     }

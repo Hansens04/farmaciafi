@@ -18,11 +18,14 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import static com.farmaciafinal.utils.Utils.*;
 
 // Define el título de la página y la ruta para esta vista
@@ -43,6 +46,7 @@ public class IngresarClienteView extends Composite<VerticalLayout> {
     Button cancelar = new Button();
     Grid<Cliente> grid = new Grid<>(Cliente.class, false);
     Cliente clienteEditar;
+    private Binder<Cliente> binder = new Binder<>(Cliente.class);
 
     // Constructor de la vista
     public IngresarClienteView() {
@@ -70,31 +74,44 @@ public class IngresarClienteView extends Composite<VerticalLayout> {
         guardar.setWidth("min-content");
         guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
+        // Configurar la validación del campo de nombre del cliente
+        binder.forField(nombreCliente)
+                .asRequired("El nombre del cliente es obligatorio")
+                .withValidator(nombre -> contieneSoloLetras(nombre), "El nombre del cliente debe contener solo letras")
+                .bind(Cliente::getNombre, Cliente::setNombre);
+
+        // Configurar la validación del campo de teléfono del cliente
+        binder.forField(telefonoCliente)
+                .withValidator(telefono -> contieneSoloNumeros(telefono), "El teléfono debe contener solo números")
+                .bind(Cliente::getTelefono, Cliente::setTelefono);
+
+        // Configurar la validación del campo de cédula del cliente
+        binder.forField(cedula)
+                .withValidator(cedula -> contieneSoloNumeros(cedula), "La cédula debe contener solo números")
+                .bind(Cliente::getCedula, Cliente::setCedula);
+
         // Lógica para guardar un cliente
         guardar.addClickListener(e -> {
-            // Obtener los valores de los campos
-            String nombreCliente = this.nombreCliente.getValue();
-            String telefonoCliente = this.telefonoCliente.getValue();
-            String cedulaCliente = this.cedula.getValue();
-            String direccionCliente = this.direccionCliente.getValue();
+            // Validar si los campos son válidos
+            if (binder.validate().isOk()) {
+                // Obtener los valores de los campos
+                String nombreCliente = this.nombreCliente.getValue();
+                String telefonoCliente = this.telefonoCliente.getValue();
+                String cedulaCliente = this.cedula.getValue();
+                String direccionCliente = this.direccionCliente.getValue();
 
-            // Validar campos obligatorios
-            if (cedulaCliente.isEmpty()) {
-                Notification.show("Debe ingresar la cedula del cliente", 3000, Notification.Position.MIDDLE);
-                return;
+                // Crear un nuevo objeto Cliente
+                Cliente cliente = new Cliente(nombreCliente, cedulaCliente, telefonoCliente, direccionCliente);
+
+                // Agregar el cliente a la lista de clientes
+                listaCliente.add(cliente);
+
+                // Actualizar el grid con la lista de clientes
+                grid.setItems(listaCliente);
+
+                // Limpiar campos después de guardar
+                limpiarCampos();
             }
-
-            // Crear un nuevo objeto Cliente
-            Cliente cliente = new Cliente(nombreCliente, cedulaCliente, telefonoCliente, direccionCliente);
-
-            // Agregar el cliente a la lista de clientes
-            listaCliente.add(cliente);
-
-            // Actualizar el grid con la lista de clientes
-            grid.setItems(listaCliente);
-
-            // Limpiar campos después de guardar
-            limpiarCampos();
         });
 
         cancelar.setText("Cancel");
@@ -157,5 +174,21 @@ public class IngresarClienteView extends Composite<VerticalLayout> {
         direccionCliente.clear();
         guardar.setText("Save");
         clienteEditar = null;
+    }
+
+    // Método para verificar si una cadena contiene solo letras
+    private boolean contieneSoloLetras(String cadena) {
+        // Verifica si la cadena solo contiene letras
+        Pattern pattern = Pattern.compile("[a-zA-Z]+");
+        Matcher matcher = pattern.matcher(cadena);
+        return matcher.matches();
+    }
+
+    // Método para verificar si una cadena contiene solo números
+    private boolean contieneSoloNumeros(String cadena) {
+        // Verifica si la cadena solo contiene números
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(cadena);
+        return matcher.matches();
     }
 }
