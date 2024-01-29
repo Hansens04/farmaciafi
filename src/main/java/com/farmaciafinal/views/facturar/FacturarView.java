@@ -1,6 +1,5 @@
 package com.farmaciafinal.views.facturar;
 
-// Importaciones de clases y utilidades necesarias
 import com.farmaciafinal.models.Cliente;
 import com.farmaciafinal.models.EncabezadoFactura;
 import com.farmaciafinal.models.Producto;
@@ -27,30 +26,28 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-// Define el título de la página y la ruta para esta vista
+import java.time.LocalDate;
+
 @PageTitle("Facturar")
 @Route(value = "facturar", layout = MainLayout.class)
 public class FacturarView extends Composite<VerticalLayout> {
-    // Declaración de componentes de la interfaz de usuario
-    VerticalLayout layoutColumn2 = new VerticalLayout();
-    H3 h3 = new H3();
-    FormLayout formLayout2Col = new FormLayout();
-    ComboBox<Cliente> clienteComboBox = new ComboBox<>("Cliente");
-    ComboBox<Producto> productoComboBox = new ComboBox<>("Producto");
-    NumberField cantidadF = new NumberField("Cantidad");
-    TextField id = new TextField("Id factura");
-    NumberField totalField = new NumberField("Total");
-    HorizontalLayout layoutRow = new HorizontalLayout();
-    Button guardar = new Button("Guardar");
-    Button cancelar = new Button("Cancelar");
-    Grid<EncabezadoFactura> grid = new Grid<>(EncabezadoFactura.class, false);
+    private VerticalLayout layoutColumn2 = new VerticalLayout();
+    private H3 h3 = new H3();
+    private FormLayout formLayout2Col = new FormLayout();
+    private ComboBox<Cliente> clienteComboBox = new ComboBox<>("Cliente");
+    private ComboBox<Producto> productoComboBox = new ComboBox<>("Producto");
+    private NumberField cantidadF = new NumberField("Cantidad");
+    private TextField idField = new TextField("ID Factura");
+    private TextField fechaField = new TextField("Fecha");
+    private NumberField totalField = new NumberField("Total");
+    private HorizontalLayout layoutRow = new HorizontalLayout();
+    private Button guardar = new Button("Guardar");
+    private Button cancelar = new Button("Cancelar");
+    private Grid<EncabezadoFactura> grid = new Grid<>(EncabezadoFactura.class, false);
 
-    // Variable para mantener el encabezado de factura en edición
     private EncabezadoFactura encabezadoFacturaEnEdicion;
 
-    // Constructor de la vista
     public FacturarView() {
-        // Configuración de diseño y estilo de la vista
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(FlexComponent.JustifyContentMode.START);
@@ -71,7 +68,11 @@ public class FacturarView extends Composite<VerticalLayout> {
         guardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cancelar.setWidth("min-content");
 
-        // Configuración de eventos y comportamiento de los botones
+        // Configurar campos de fecha y ID de factura
+        fechaField.setReadOnly(true);
+        LocalDate fechaActual = LocalDate.now();
+        fechaField.setValue(fechaActual.toString());
+
         guardar.addClickListener(e -> {
             Cliente clienteSeleccionado = clienteComboBox.getValue();
             Producto productoSeleccionado = productoComboBox.getValue();
@@ -82,65 +83,55 @@ public class FacturarView extends Composite<VerticalLayout> {
                 return;
             }
 
-            // Calcular el total
+            if (!productoSeleccionado.haySuficienteStock(cantidad)) {
+                Notification.show("No hay suficiente stock para el producto seleccionado", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+
             double total = calcularTotal(productoSeleccionado.getPrecio(), cantidad);
             totalField.setValue(total);
 
             if (encabezadoFacturaEnEdicion != null) {
-                // Si hay un encabezado en edición, actualiza sus valores
-                encabezadoFacturaEnEdicion.actualizar(clienteSeleccionado, productoSeleccionado, cantidad, total, id.getValue());
-
-                // Limpia el estado de edición y actualiza el botón de guardar
-                encabezadoFacturaEnEdicion = null;
-                guardar.setText("Guardar");
+                encabezadoFacturaEnEdicion.actualizar(clienteSeleccionado, productoSeleccionado, cantidad, total, idField.getValue());
             } else {
-                // Si no hay encabezado en edición, crea uno nuevo y agrega a la lista
-                EncabezadoFactura encabezadoFactura = new EncabezadoFactura(clienteSeleccionado, productoSeleccionado, cantidad, total, id.getValue());
+                EncabezadoFactura encabezadoFactura = new EncabezadoFactura(clienteSeleccionado, productoSeleccionado, cantidad, total, idField.getValue());
                 Utils.listaEncabezadoFactura.add(encabezadoFactura);
             }
 
-            // Actualiza el Grid
-            grid.setItems(Utils.listaEncabezadoFactura);
+            productoSeleccionado.actualizarStock(cantidad);
 
-            // Limpiar los campos después de agregar a la factura
-            clienteComboBox.clear();
-            productoComboBox.clear();
-            cantidadF.clear();
-            totalField.clear();
-            id.clear();
+            actualizarGridYLimpiarCampos();
 
             Notification.show("Factura guardada exitosamente", 3000, Notification.Position.MIDDLE);
         });
 
         cancelar.addClickListener(e -> {
-            // Borrar todos los datos de los ComboBox y NumberField
             clienteComboBox.clear();
             productoComboBox.clear();
             cantidadF.clear();
             totalField.clear();
-            id.clear();
-
-            Notification.show("Operación cancelada", 3000, Notification.Position.MIDDLE);
+            // No limpiamos los campos de fecha y ID, ya que son generados automáticamente
         });
 
-        // Añadir componentes al layoutColumn2
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
         formLayout2Col.add(clienteComboBox);
         formLayout2Col.add(productoComboBox);
         formLayout2Col.add(cantidadF);
-        formLayout2Col.add(id);
+        formLayout2Col.add(idField);
+        formLayout2Col.add(fechaField);
         formLayout2Col.add(totalField);
         layoutRow.add(cancelar);
-        layoutRow.add(guardar); // Cambio en el orden de añadir botones
+        layoutRow.add(guardar);
         layoutColumn2.add(layoutRow);
 
-        // Configura el Grid para mostrar los encabezados de factura
         grid.addColumn(EncabezadoFactura::getId).setHeader("ID").setAutoWidth(true);
         grid.addColumn(encabezadoFactura -> encabezadoFactura.getCliente().getCedula()).setHeader("Cedula Cliente").setAutoWidth(true);
         grid.addColumn(encabezadoFactura -> encabezadoFactura.getProducto().getNombreProducto()).setHeader("Producto").setAutoWidth(true);
         grid.addColumn(EncabezadoFactura::getCantidad).setHeader("Cantidad").setAutoWidth(true);
         grid.addColumn(EncabezadoFactura::getTotal).setHeader("Total").setAutoWidth(true);
+        grid.addColumn(EncabezadoFactura::getFecha).setHeader("Fecha").setAutoWidth(true); // Mostrar la fecha en el grid
+
         grid.addColumn(
                 new ComponentRenderer<>(encabezadoFactura -> {
                     Button botonBorrar = new Button(new Icon(VaadinIcon.TRASH));
@@ -158,16 +149,23 @@ public class FacturarView extends Composite<VerticalLayout> {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         layoutColumn2.add(grid);
 
-        // Añadir el layoutColumn2 al contenido de la vista
         getContent().add(layoutColumn2);
     }
 
-    // Método privado para calcular el total de una factura
     private double calcularTotal(double precio, int cantidad) {
         return precio * cantidad;
     }
 
-    // Método privado para editar una factura existente
+    private void actualizarGridYLimpiarCampos() {
+        grid.setItems(Utils.listaEncabezadoFactura);
+
+        clienteComboBox.clear();
+        productoComboBox.clear();
+        cantidadF.clear();
+        totalField.clear();
+        // No limpiamos los campos de fecha y ID, ya que son generados automáticamente
+    }
+
     private void editarFactura(EncabezadoFactura encabezadoFactura) {
         encabezadoFacturaEnEdicion = encabezadoFactura;
         guardar.setText("Actualizar");
@@ -175,22 +173,12 @@ public class FacturarView extends Composite<VerticalLayout> {
         productoComboBox.setValue(encabezadoFactura.getProducto());
         cantidadF.setValue((double) encabezadoFactura.getCantidad());
         totalField.setValue(encabezadoFactura.getTotal());
-        id.setValue(encabezadoFactura.getId());
+        idField.setValue(encabezadoFactura.getId());
     }
 
-    // Método privado para borrar una factura existente
     private void borrarFactura(EncabezadoFactura encabezadoFactura) {
         Utils.listaEncabezadoFactura.remove(encabezadoFactura);
         grid.setItems(Utils.listaEncabezadoFactura);
         Notification.show("Factura borrada exitosamente", 3000, Notification.Position.MIDDLE);
-    }
-
-    // Método para calcular el total de las ventas
-    public double calcularTotalVentas() {
-        double totalVentas = 0;
-        for (EncabezadoFactura factura : Utils.listaEncabezadoFactura) {
-            totalVentas += factura.getTotal();
-        }
-        return totalVentas;
     }
 }

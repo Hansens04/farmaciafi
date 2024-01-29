@@ -1,5 +1,7 @@
 package com.farmaciafinal.models;
 
+import java.time.LocalDate;
+
 public class EncabezadoFactura {
     //Atributos
     private Cliente cliente;
@@ -7,14 +9,16 @@ public class EncabezadoFactura {
     private int cantidad;
     private double total;
     private String id;
+    private LocalDate fecha;
 
     // Constructor
-    public EncabezadoFactura(Cliente cliente, Producto producto, int cantidad, double total,String id) {
+    public EncabezadoFactura(Cliente cliente, Producto producto, int cantidad, double total, String id) {
         this.cliente = cliente;
         this.producto = producto;
         this.cantidad = cantidad;
         this.total = total;
-        this.id=id;
+        this.id = id;
+        this.fecha = LocalDate.now(); // Inicializar la fecha con la fecha actual al crear la factura
     }
 
 
@@ -62,6 +66,14 @@ public class EncabezadoFactura {
     // Getter y setter para cantidad
     public int getCantidad() {
         return cantidad;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
     }
 
     public void setCantidad(int cantidad) {

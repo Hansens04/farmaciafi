@@ -4,7 +4,6 @@ public class DetallePedido {
     //Atributos
     private Producto productos;
     private EncabezadoPedido encabezadoPedido;
-    private double total;
 
     //Constructor
     public DetallePedido(Producto productos, EncabezadoPedido encabezadoPedido){
@@ -21,11 +20,13 @@ public class DetallePedido {
     }
 
     //Metodo para calcular el total
-    public double calcularTotal(){
-        total=0.0;
-        total= darProducto().getPrecio()* darProducto().getStock();
-        return total;
+    public double calcularTotal() {
+        // Si no hay producto o no hay stock, el total es cero
+        if (productos == null || productos.getStock() <= 0) {
+            return 0.0;
+        }
+        // Calcular el total multiplicando el precio por la cantidad en stock
+        return productos.getPrecio() * productos.getStock();
     }
-
 
 }

@@ -53,8 +53,6 @@ public class EstadoFinancieroView extends Composite<VerticalLayout> {
         h22.setWidth("max-content");
         h42.setText("Total de compras: " + totalCompras);
         h42.setWidth("max-content");
-        h52.setText("Heading");
-        h52.setWidth("max-content");
         h23.setText("Patrimonio");
         h23.setWidth("max-content");
         h53.setText("Diferencia (Ventas - Compras): " + diferencia); // Mostrar la diferencia entre ventas y compras

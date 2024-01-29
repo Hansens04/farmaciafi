@@ -84,6 +84,12 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         fechaEnvioPicker.setWidth("100%");
         formLayout2Col.add(fechaEnvioPicker);
 
+        // Obtener la fecha actual
+        LocalDate fechaActual = LocalDate.now();
+
+        // Establecer la fecha mínima del DatePicker como la fecha actual
+        fechaEnvioPicker.setMin(fechaActual);
+
         guardar.addClickListener(e -> {
             // Método invocado al hacer clic en el botón "Guardar"
             guardarPedido();
@@ -166,6 +172,11 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
             encabezadoPedidoEnEdicion = nuevoEncabezado;
         }
 
+        // Actualizar el stock del producto si el estado del pedido es "entregado"
+        if (estadoPedido != null && estadoPedido.equals("Entregado")) {
+            productoSeleccionado.setStock(productoSeleccionado.getStock() + cantidad);
+        }
+
         // Actualizar el grid y limpiar los campos
         actualizarGridYLimpiarCampos();
 
@@ -233,11 +244,4 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
     }
 
     // Método para calcular el total de todas las compras
-    public double calcularTotalCompras() {
-        double totalCompras = 0;
-        for (EncabezadoPedido pedido : Utils.listaEncabezadoPedido) {
-            totalCompras += pedido.getTotal();
-        }
-        return totalCompras;
-    }
 }

@@ -43,7 +43,7 @@ public class FacturasClienteView extends Composite<VerticalLayout> {
 
         // Inicializar Grid para mostrar las facturas
         grid = new Grid<>(EncabezadoFactura.class, false);
-        grid.setColumns("cliente.cedula", "producto.nombreProducto", "cantidad", "total", "id");
+        grid.setColumns("id", "fecha", "cliente.cedula", "producto.nombreProducto", "cantidad", "total");
 
         // Agregar componentes al diseño
         getContent().add(clienteComboBox, buscarButton, grid);

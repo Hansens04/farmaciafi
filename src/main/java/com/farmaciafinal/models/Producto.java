@@ -74,6 +74,14 @@ public class Producto {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
+    public boolean haySuficienteStock(int cantidad) {
+        return this.stock >= cantidad;
+    }
+
+    // Método para actualizar la cantidad en stock después de la factura
+    public void actualizarStock(int cantidadFacturada) {
+        this.stock -= cantidadFacturada;
+    }
 
     //Metodo para modificar productos
     public void modificarProducto(String pIdProducto,String pNombreProducto, String pDescripcion,

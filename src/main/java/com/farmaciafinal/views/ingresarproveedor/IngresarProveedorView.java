@@ -159,9 +159,9 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
             return;
         }
 
-        // Validar formato del teléfono (solo números)
-        if (!esNumero(telefonoP)) {
-            Notification.show("Error: El teléfono debe contener solo números.");
+        // Validar formato del teléfono (solo números y longitud 10)
+        if (!telefonoP.matches("^09\\d{8}$")) {
+            Notification.show("Error: El teléfono debe comenzar con '09' y tener 10 dígitos.");
             return;
         }
 
@@ -201,8 +201,8 @@ public class IngresarProveedorView extends Composite<VerticalLayout> {
 
     // Método para verificar si una cadena contiene solo letras
     private boolean contieneSoloLetras(String cadena) {
-        // Verifica si la cadena solo contiene letras
-        Pattern pattern = Pattern.compile("[a-zA-Z]+");
+        // Verifica si la cadena solo contiene letras y espacios
+        Pattern pattern = Pattern.compile("[a-zA-Z ]+");
         Matcher matcher = pattern.matcher(cadena);
         return matcher.matches();
     }

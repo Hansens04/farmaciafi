@@ -82,12 +82,14 @@ public class IngresarClienteView extends Composite<VerticalLayout> {
 
         // Configurar la validación del campo de teléfono del cliente
         binder.forField(telefonoCliente)
-                .withValidator(telefono -> contieneSoloNumeros(telefono), "El teléfono debe contener solo números")
+                .asRequired("El teléfono del cliente es obligatorio")
+                .withValidator(telefono -> telefono.matches("^09\\d{8}$"), "El teléfono debe comenzar con '09' y tener 10 dígitos")
                 .bind(Cliente::getTelefono, Cliente::setTelefono);
 
         // Configurar la validación del campo de cédula del cliente
         binder.forField(cedula)
-                .withValidator(cedula -> contieneSoloNumeros(cedula), "La cédula debe contener solo números")
+                .asRequired("La cédula del cliente es obligatoria")
+                .withValidator(cedula -> cedula.matches("^\\d{10}$"), "La cédula debe tener exactamente 10 dígitos")
                 .bind(Cliente::getCedula, Cliente::setCedula);
 
         // Lógica para guardar un cliente
@@ -177,9 +179,10 @@ public class IngresarClienteView extends Composite<VerticalLayout> {
     }
 
     // Método para verificar si una cadena contiene solo letras
+    // Método para verificar si una cadena contiene solo letras (incluyendo espacios)
     private boolean contieneSoloLetras(String cadena) {
-        // Verifica si la cadena solo contiene letras
-        Pattern pattern = Pattern.compile("[a-zA-Z]+");
+        // Verifica si la cadena solo contiene letras y espacios
+        Pattern pattern = Pattern.compile("[a-zA-Z ]+");
         Matcher matcher = pattern.matcher(cadena);
         return matcher.matches();
     }
