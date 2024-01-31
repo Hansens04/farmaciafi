@@ -22,6 +22,15 @@ public class Proveedor{
         this.direccion=direccion;
         this.listaProductos = producto;
     }
+    public Proveedor(String nombreProveedor, String telefonoProveedor,String codigo,String direccion) {
+        this.nombreProveedor = nombreProveedor;
+        this.telefonoProveedor = telefonoProveedor;
+        this.codigo=codigo;
+        this.direccion=direccion;
+        this.listaProductos= new ArrayList<String>();
+        this.encabezadoP=new ArrayList<EncabezadoPedido>();
+
+    }
 
 
     public String getNombreProveedor() {
@@ -44,6 +53,25 @@ public class Proveedor{
         return codigo;
     }
 
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public List<String> getListaProductos() {
+        return listaProductos;
+    }
+
+    public void setListaProductos(List<String> listaProductos) {
+        this.listaProductos = listaProductos;
+    }
+
+    public List<EncabezadoPedido> getEncabezadoP() {
+        return encabezadoP;
+    }
+
+    public void setEncabezadoP(List<EncabezadoPedido> encabezadoP) {
+        this.encabezadoP = encabezadoP;
+    }
 
     public String getDireccion() {
         return direccion;

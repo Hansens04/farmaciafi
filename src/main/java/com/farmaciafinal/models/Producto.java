@@ -1,32 +1,40 @@
 package com.farmaciafinal.models;
+
 import com.vaadin.flow.component.textfield.NumberField;
 
-import java.util.List;
-
 public class Producto {
-    //Atributos
+    // Atributos
     private String idProducto;
     private String nombreProducto;
     private int stock;
     private int cantidadMinima;
     private String descripcion;
     private double precio;
+    private int ventas;
 
-    //Constructor
+    // Constructor
     public Producto(String idProducto, String nombreProducto, String descripcion,
-                    int stock, int cantidadMinima, double precio){
-        this.idProducto= idProducto;
-        this.nombreProducto= nombreProducto;
-        this.descripcion= descripcion;
-        this.stock= stock;
-        this.cantidadMinima= cantidadMinima;
-        this.precio=precio;
+                    int stock, int cantidadMinima, double precio) {
+        this.idProducto = idProducto;
+        this.nombreProducto = nombreProducto;
+        this.descripcion = descripcion;
+        this.stock = stock;
+        this.cantidadMinima = cantidadMinima;
+        this.precio = precio;
+        this.ventas = 0;
     }
 
-    public Producto(String codigoProducto, String nombreProducto, String descripcion, 
-    NumberField stock, int cantidadProducto, double precioProducto) {
+    // Método para registrar una venta del producto
+    public void registrarVenta(int cantidadVendida) {
+        this.ventas += cantidadVendida;
     }
 
+    // Método para obtener el número de ventas del producto
+    public int getVentas() {
+        return ventas;
+    }
+
+    // Getters y setters
     public String getIdProducto() {
         return idProducto;
     }
@@ -74,30 +82,30 @@ public class Producto {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
+
+    // Método para verificar si hay suficiente stock para una cantidad específica
     public boolean haySuficienteStock(int cantidad) {
         return this.stock >= cantidad;
     }
 
-    // Método para actualizar la cantidad en stock después de la factura
-    public void actualizarStock(int cantidadFacturada) {
-        this.stock -= cantidadFacturada;
+    // Método para actualizar la cantidad en stock después de realizar una venta
+    public void actualizarStock(int cantidadVendida) {
+        this.stock -= cantidadVendida;
     }
 
-    //Metodo para modificar productos
-    public void modificarProducto(String pIdProducto,String pNombreProducto, String pDescripcion,
-                                  int pStock, int pCantidadMinima, double pPrecio){
-        this.idProducto= pIdProducto;
-        this.nombreProducto= pNombreProducto;
-        this.descripcion= pDescripcion;
-        this.stock= pStock;
-        this.cantidadMinima= pCantidadMinima;
-        this.precio=pPrecio;
-    }
-
-    //Metodo para saber cuando se necesita reestablecimiento
+    // Método para saber si se necesita reabastecer el producto
     public boolean necesitaAbastecimiento() {
         return stock < cantidadMinima;
     }
 
-    //consultas productos: se ha abastecido el ultimo mes (rango de fecha), detalles,
+    // Método para modificar los atributos del producto
+    public void modificarProducto(String idProducto, String nombreProducto, String descripcion,
+                                  int stock, int cantidadMinima, double precio) {
+        this.idProducto = idProducto;
+        this.nombreProducto = nombreProducto;
+        this.descripcion = descripcion;
+        this.stock = stock;
+        this.cantidadMinima = cantidadMinima;
+        this.precio = precio;
+    }
 }

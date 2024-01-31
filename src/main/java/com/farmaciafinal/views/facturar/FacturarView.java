@@ -13,6 +13,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -27,6 +28,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @PageTitle("Facturar")
 @Route(value = "facturar", layout = MainLayout.class)
@@ -39,11 +42,12 @@ public class FacturarView extends Composite<VerticalLayout> {
     private NumberField cantidadF = new NumberField("Cantidad");
     private TextField idField = new TextField("ID Factura");
     private TextField fechaField = new TextField("Fecha");
-    private NumberField totalField = new NumberField("Total");
     private HorizontalLayout layoutRow = new HorizontalLayout();
     private Button guardar = new Button("Guardar");
     private Button cancelar = new Button("Cancelar");
     private Grid<EncabezadoFactura> grid = new Grid<>(EncabezadoFactura.class, false);
+    private H4 masVendido = new H4();
+    private H4 menosVendido = new H4();
 
     private EncabezadoFactura encabezadoFacturaEnEdicion;
 
@@ -89,7 +93,7 @@ public class FacturarView extends Composite<VerticalLayout> {
             }
 
             double total = calcularTotal(productoSeleccionado.getPrecio(), cantidad);
-            totalField.setValue(total);
+
 
             if (encabezadoFacturaEnEdicion != null) {
                 encabezadoFacturaEnEdicion.actualizar(clienteSeleccionado, productoSeleccionado, cantidad, total, idField.getValue());
@@ -99,8 +103,10 @@ public class FacturarView extends Composite<VerticalLayout> {
             }
 
             productoSeleccionado.actualizarStock(cantidad);
+            productoSeleccionado.registrarVenta(cantidad); // Registrar la venta del producto
 
             actualizarGridYLimpiarCampos();
+            actualizarProductosVendidos();
 
             Notification.show("Factura guardada exitosamente", 3000, Notification.Position.MIDDLE);
         });
@@ -109,7 +115,7 @@ public class FacturarView extends Composite<VerticalLayout> {
             clienteComboBox.clear();
             productoComboBox.clear();
             cantidadF.clear();
-            totalField.clear();
+
             // No limpiamos los campos de fecha y ID, ya que son generados automáticamente
         });
 
@@ -120,7 +126,6 @@ public class FacturarView extends Composite<VerticalLayout> {
         formLayout2Col.add(cantidadF);
         formLayout2Col.add(idField);
         formLayout2Col.add(fechaField);
-        formLayout2Col.add(totalField);
         layoutRow.add(cancelar);
         layoutRow.add(guardar);
         layoutColumn2.add(layoutRow);
@@ -149,7 +154,12 @@ public class FacturarView extends Composite<VerticalLayout> {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         layoutColumn2.add(grid);
 
+        // Agregar H4 para mostrar el producto más vendido y menos vendido
+        layoutColumn2.add(masVendido);
+        layoutColumn2.add(menosVendido);
+
         getContent().add(layoutColumn2);
+        actualizarProductosVendidos();
     }
 
     private double calcularTotal(double precio, int cantidad) {
@@ -162,7 +172,6 @@ public class FacturarView extends Composite<VerticalLayout> {
         clienteComboBox.clear();
         productoComboBox.clear();
         cantidadF.clear();
-        totalField.clear();
         // No limpiamos los campos de fecha y ID, ya que son generados automáticamente
     }
 
@@ -172,7 +181,6 @@ public class FacturarView extends Composite<VerticalLayout> {
         clienteComboBox.setValue(encabezadoFactura.getCliente());
         productoComboBox.setValue(encabezadoFactura.getProducto());
         cantidadF.setValue((double) encabezadoFactura.getCantidad());
-        totalField.setValue(encabezadoFactura.getTotal());
         idField.setValue(encabezadoFactura.getId());
     }
 
@@ -180,5 +188,47 @@ public class FacturarView extends Composite<VerticalLayout> {
         Utils.listaEncabezadoFactura.remove(encabezadoFactura);
         grid.setItems(Utils.listaEncabezadoFactura);
         Notification.show("Factura borrada exitosamente", 3000, Notification.Position.MIDDLE);
+        actualizarProductosVendidos();
+    }
+
+    private void actualizarProductosVendidos() {
+        masVendido.setText("Producto más vendido: " + obtenerProductoMasVendido());
+        menosVendido.setText("Producto menos vendido: " + obtenerProductoMenosVendido());
+    }
+
+    private String obtenerProductoMasVendido() {
+        if (Utils.listaEncabezadoFactura.isEmpty()) {
+            return "N/A";
+        }
+
+        Map<String, Integer> ventasPorProducto = new HashMap<>();
+        for (EncabezadoFactura factura : Utils.listaEncabezadoFactura) {
+            String nombreProducto = factura.getProducto().getNombreProducto();
+            ventasPorProducto.put(nombreProducto, ventasPorProducto.getOrDefault(nombreProducto, 0) + factura.getCantidad());
+        }
+
+        // Encontrar el producto con la mayor cantidad de ventas
+        return ventasPorProducto.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
+    }
+
+    private String obtenerProductoMenosVendido() {
+        if (Utils.listaEncabezadoFactura.isEmpty()) {
+            return "N/A";
+        }
+
+        Map<String, Integer> ventasPorProducto = new HashMap<>();
+        for (EncabezadoFactura factura : Utils.listaEncabezadoFactura) {
+            String nombreProducto = factura.getProducto().getNombreProducto();
+            ventasPorProducto.put(nombreProducto, ventasPorProducto.getOrDefault(nombreProducto, 0) + factura.getCantidad());
+        }
+
+        // Encontrar el producto con la menor cantidad de ventas
+        return ventasPorProducto.entrySet().stream()
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
     }
 }

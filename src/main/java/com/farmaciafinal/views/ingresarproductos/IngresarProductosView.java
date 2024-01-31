@@ -43,7 +43,6 @@ public class IngresarProductosView extends Composite<VerticalLayout> {
     Button cancelar = new Button();
     Producto productoEditar;
     Grid<Producto> grid = new Grid<>();
-    Grid<Producto> gridMayorPrecio = new Grid<>();
 
     public IngresarProductosView() {
         getContent().setWidth("100%");
@@ -105,7 +104,6 @@ public class IngresarProductosView extends Composite<VerticalLayout> {
 
             limpiarCampos();
             grid.setItems(listaProdcuto);
-            actualizarGridMayorPrecio();
         });
 
         cancelar.setText("Cancel");
@@ -119,7 +117,6 @@ public class IngresarProductosView extends Composite<VerticalLayout> {
         layoutColumn2.add(layoutRow);
         layoutRow.add(guardar, cancelar);
         layoutColumn2.add(grid);
-        layoutColumn2.add(gridMayorPrecio);
 
         grid.addColumn(Producto::getIdProducto).setHeader("Código").setAutoWidth(true);
         grid.addColumn(Producto::getNombreProducto).setHeader("Nombre").setAutoWidth(true);
@@ -133,7 +130,6 @@ public class IngresarProductosView extends Composite<VerticalLayout> {
             botonBorrar.addClickListener(event -> {
                 listaProdcuto.remove(producto);
                 grid.getDataProvider().refreshAll();
-                actualizarGridMayorPrecio();
             });
             botonBorrar.setIcon(new Icon(VaadinIcon.TRASH));
 
@@ -159,14 +155,6 @@ public class IngresarProductosView extends Composite<VerticalLayout> {
 
         grid.setItems(listaProdcuto);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // Configuración del grid para mostrar los productos con mayor precio
-        gridMayorPrecio.addColumn(Producto::getIdProducto).setHeader("Código").setAutoWidth(true);
-        gridMayorPrecio.addColumn(Producto::getNombreProducto).setHeader("Nombre").setAutoWidth(true);
-        gridMayorPrecio.addColumn(Producto::getPrecio).setHeader("Precio").setAutoWidth(true);
-        gridMayorPrecio.addColumn(Producto::getDescripcion).setHeader("Descripción").setAutoWidth(true);
-
-        actualizarGridMayorPrecio();
     }
 
     private boolean productoYaExiste(String codigoProducto) {
@@ -183,14 +171,5 @@ public class IngresarProductosView extends Composite<VerticalLayout> {
         guardar.setText("Save");
         codigo.setReadOnly(false);
         productoEditar = null;
-    }
-
-    private void actualizarGridMayorPrecio() {
-        List<Producto> productosOrdenadosPorPrecio = listaProdcuto.stream()
-                .sorted(Comparator.comparingDouble(Producto::getPrecio).reversed()) // Ordenar por precio descendente
-                .limit(5) // Obtener los primeros 5 productos con mayor precio
-                .toList();
-
-        gridMayorPrecio.setItems(productosOrdenadosPorPrecio);
     }
 }

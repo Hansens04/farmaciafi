@@ -41,7 +41,6 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
     private final ComboBox<Producto> productoComboBox = new ComboBox<>("Producto");
     private final NumberField cantidadF = new NumberField("Cantidad");
     private final TextField idPedido = new TextField("Id Pedido");
-    private final NumberField totalField = new NumberField("Total");
     private final HorizontalLayout layoutRow = new HorizontalLayout();
     private final Button guardar = new Button("Guardar");
     private final Button cancelar = new Button("Cancelar");
@@ -110,7 +109,7 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         formLayout2Col.add(productoComboBox);
         formLayout2Col.add(cantidadF);
         formLayout2Col.add(idPedido);
-        formLayout2Col.add(totalField);
+
         formLayout2Col.add(estadoComboBox);
 
         layoutColumn2.add(layoutRow);
@@ -161,7 +160,6 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
 
         // Calcular el total del pedido
         double total = calcularTotal(productoSeleccionado.getPrecio(), cantidad);
-        totalField.setValue(total);
 
         // Crear o actualizar el encabezado del pedido
         if (encabezadoPedidoEnEdicion != null) {
@@ -203,7 +201,6 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         proveedorComboBox.setValue(encabezadoPedido.getProveedor());
         productoComboBox.setValue(encabezadoPedido.getProducto());
         cantidadF.setValue((double) encabezadoPedido.getCantidad());
-        totalField.setValue(encabezadoPedido.getTotal());
         idPedido.setValue(encabezadoPedido.getCodigoPedido());
         estadoComboBox.setValue(encabezadoPedido.getEstado());
         fechaEnvioPicker.setValue(encabezadoPedido.getFechaEnvio());
@@ -235,7 +232,6 @@ public class RealizarPedidoView extends Composite<VerticalLayout> {
         proveedorComboBox.clear();
         productoComboBox.clear();
         cantidadF.clear();
-        totalField.clear();
         idPedido.clear();
         estadoComboBox.clear();
         fechaEnvioPicker.clear();
