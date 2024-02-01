@@ -1,56 +1,46 @@
 package com.farmaciafinal.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DetalleFactura {
 
-    //Atributos
-    private List<Producto> productos;
+    // Atributos
+    private Producto producto;
+    private String nombreProducto; // Nuevo atributo para almacenar el nombre del producto
+    private int cantidad;
 
     // Constructor
     public DetalleFactura() {
-        this.productos = new ArrayList<>();
     }
 
     public DetalleFactura(Producto producto, int cantidad) {
+        this.producto = producto;
+        this.nombreProducto = producto.getNombreProducto(); // Establecer el nombre del producto
+        this.cantidad = cantidad;
     }
 
-    public List<Producto> getProductos() {
-        return productos;
+    // Getters y setters
+    public Producto getProducto() {
+        return producto;
     }
 
-    public double calcularSubtotal() {
-        double subtotal = 0.0;
-        for (Producto producto : productos) {
-            subtotal += producto.getPrecio();
-        }
-        return subtotal;
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
-    // Metodo para calcular el descuento de las compras mayor a 15 productos
-    public double calcularDescuento() {
-        double descuento = 0.0;
-        if (productos != null && productos.size() >= 15) {
-            descuento = calcularSubtotal() * 0.25; // 25% de descuento si hay 15 o más productos
-        }
-        return descuento;
+    public String getNombreProducto() {
+        return nombreProducto;
     }
 
-    //Metodo para calcular total
-    public double calcularTotal() {
-        return calcularSubtotal() - calcularDescuento();
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
     }
 
-    //Metodo para agregar un producto
-    public void agregarProducto(Producto producto) {
-        productos.add(producto);
+    public int getCantidad() {
+        return cantidad;
     }
 
-    @Override
-    public String toString() {
-        return "DetalleFactura{" +
-                "productos=" + productos +
-                '}';
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
     }
+
+    // Otros métodos, como calcular subtotal, etc.
 }

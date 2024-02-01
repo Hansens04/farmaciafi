@@ -1,26 +1,31 @@
 package com.farmaciafinal.models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EncabezadoFactura {
-    //Atributos
+    // Atributos
     private Cliente cliente;
-    private Producto producto;
-    private int cantidad;
-    private double total;
+    private List<DetalleFactura> detalles; // Lista de detalles de la factura
     private String id;
-    private LocalDate fecha;
+    private double total;
+    private int cantidad;
 
     // Constructor
-    public EncabezadoFactura(Cliente cliente, Producto producto, int cantidad, double total, String id) {
+    public EncabezadoFactura(Cliente cliente, String id) {
         this.cliente = cliente;
-        this.producto = producto;
-        this.cantidad = cantidad;
-        this.total = total;
         this.id = id;
-        this.fecha = LocalDate.now(); // Inicializar la fecha con la fecha actual al crear la factura
+        this.detalles = new ArrayList<>();
     }
 
+    public List<DetalleFactura> getDetalles() {
+        return detalles;
+    }
+
+    public void agregarDetalle(DetalleFactura detalle) {
+        detalles.add(detalle);
+    }
 
     public String getId() {
         return id;
@@ -30,20 +35,18 @@ public class EncabezadoFactura {
         this.id = id;
     }
 
-    //Metodo para calcular el total de la factura
+    // Método para calcular el total de la factura
     private double calcularTotal(double precio, int cantidad) {
         return precio * cantidad;
     }
 
-    //Metodo para modificar a la factura
-    public void actualizar(Cliente cliente, Producto producto, int cantidad, double total,String id) {
+    // Método para modificar a la factura
+    public void actualizar(Cliente cliente, Producto producto, int cantidad, double total, String id) {
         this.cliente = cliente;
-        this.producto = producto;
         this.cantidad = cantidad;
         this.total = total;
-        this.id=id;
+        this.id = id;
     }
-
 
     // Getter y setter para cliente
     public Cliente getCliente() {
@@ -52,32 +55,6 @@ public class EncabezadoFactura {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-    }
-
-    // Getter y setter para producto
-    public Producto getProducto() {
-        return producto;
-    }
-
-    public void setProducto(Producto producto) {
-        this.producto = producto;
-    }
-
-    // Getter y setter para cantidad
-    public int getCantidad() {
-        return cantidad;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
-
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
     }
 
     // Getter y setter para total
