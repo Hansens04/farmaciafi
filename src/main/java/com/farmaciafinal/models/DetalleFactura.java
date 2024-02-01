@@ -13,6 +13,9 @@ public class DetalleFactura {
         this.productos = new ArrayList<>();
     }
 
+    public DetalleFactura(Producto producto, int cantidad) {
+    }
+
     public List<Producto> getProductos() {
         return productos;
     }

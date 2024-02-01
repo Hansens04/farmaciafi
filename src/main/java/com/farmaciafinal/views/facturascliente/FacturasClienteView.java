@@ -16,7 +16,7 @@ import com.vaadin.flow.router.Route;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+//
 // Define el título de la página y la ruta para esta vista
 @PageTitle("Facturas Cliente")
 @Route(value = "facturas-cliente", layout = MainLayout.class)
