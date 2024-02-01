@@ -11,12 +11,18 @@ public class EncabezadoFactura {
     private String id;
     private double total;
     private int cantidad;
+    private LocalDate fecha;
 
     // Constructor
     public EncabezadoFactura(Cliente cliente, String id) {
         this.cliente = cliente;
         this.id = id;
         this.detalles = new ArrayList<>();
+    }
+    public EncabezadoFactura(Cliente cliente, String id, LocalDate fecha) {
+        this.cliente = cliente;
+        this.id = id;
+        this.fecha=fecha;
     }
 
     public List<DetalleFactura> getDetalles() {
@@ -48,6 +54,7 @@ public class EncabezadoFactura {
         this.id = id;
     }
 
+
     // Getter y setter para cliente
     public Cliente getCliente() {
         return cliente;
@@ -64,5 +71,9 @@ public class EncabezadoFactura {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
     }
 }

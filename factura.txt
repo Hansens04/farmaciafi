@@ -1,8 +1,9 @@
 -------------------------------------Factura----------------------------------------------
-Nombre del Cliente: Alejandra mi amor
+Fecha: 2024-02-01
+ID de la factura: 1
+Nombre del Cliente: e
 Cédula: 1726694332
 Teléfono: 0986800831
 -------------------------------------Detalle del Pedido-----------------------------------
-Producto: Paracetamol - Cantidad: 1 - Precio unitario: 1.0 - Subtotal: 1.0
-Producto: Ibuprofeno - Cantidad: 1 - Precio unitario: 1.0 - Subtotal: 1.0
-Total: 2.0
+Producto: e - Cantidad: 1 - Precio unitario: 121.0 - Subtotal: 121.0
+Total: 121.0

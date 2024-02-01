@@ -17,6 +17,7 @@ import com.vaadin.flow.router.Route;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @PageTitle("Facturar")
@@ -26,9 +27,10 @@ public class FacturarView extends VerticalLayout {
     private ComboBox<Cliente> clienteComboBox = new ComboBox<>("Seleccione un cliente");
     private ComboBox<Producto> productoComboBox = new ComboBox<>("Seleccione un producto");
     private TextField cantidadTextField = new TextField("Cantidad");
+    private TextField idFacturaTextField = new TextField("ID de la factura");
     private Button agregarDetalleButton = new Button("Agregar Detalle");
     private Button generarFacturaButton = new Button("Generar Factura");
-    private Grid<DetalleFactura> detallesGrid = new Grid<>(DetalleFactura.class);
+    private Grid<DetalleFactura> detallesGrid = new Grid<>(DetalleFactura.class, false);
 
     private EncabezadoFactura encabezadoFactura;
 
@@ -41,9 +43,11 @@ public class FacturarView extends VerticalLayout {
         agregarDetalleButton.addClickListener(e -> agregarDetalle());
         generarFacturaButton.addClickListener(e -> generarFactura());
 
+        detallesGrid.addColumn(DetalleFactura::getNombreProducto).setHeader("Producto");
         detallesGrid.addColumn(DetalleFactura::getCantidad).setHeader("Cantidad");
+        detallesGrid.addColumn(detalle -> detalle.getProducto().getPrecio() * detalle.getCantidad()).setHeader("Subtotal");
 
-        add(clienteComboBox, productoComboBox, cantidadTextField,
+        add(clienteComboBox, productoComboBox, cantidadTextField, idFacturaTextField,
                 agregarDetalleButton, generarFacturaButton, detallesGrid);
     }
 
@@ -51,9 +55,10 @@ public class FacturarView extends VerticalLayout {
         Cliente clienteSeleccionado = clienteComboBox.getValue();
         Producto productoSeleccionado = productoComboBox.getValue();
         String cantidadString = cantidadTextField.getValue();
+        String idFactura = idFacturaTextField.getValue();
 
-        if (clienteSeleccionado == null || productoSeleccionado == null || cantidadString.isEmpty()) {
-            Notification.show("Por favor, seleccione un cliente, un producto y especifique la cantidad.");
+        if (clienteSeleccionado == null || productoSeleccionado == null || cantidadString.isEmpty() || idFactura.isEmpty()) {
+            Notification.show("Por favor, complete todos los campos.");
             return;
         }
 
@@ -72,12 +77,16 @@ public class FacturarView extends VerticalLayout {
 
         if (encabezadoFactura == null) {
             // Crear un nuevo encabezado de factura si no existe
-            encabezadoFactura = new EncabezadoFactura(clienteSeleccionado, "1");
+            encabezadoFactura = new EncabezadoFactura(clienteSeleccionado, idFactura);
         }
 
         DetalleFactura detalle = new DetalleFactura(productoSeleccionado, cantidad);
         encabezadoFactura.agregarDetalle(detalle);
         detallesGrid.setItems(encabezadoFactura.getDetalles());
+
+        // Limpiar campos después de agregar un detalle
+        productoComboBox.clear();
+        cantidadTextField.clear();
     }
 
     private void generarFactura() {
@@ -88,24 +97,23 @@ public class FacturarView extends VerticalLayout {
 
         Cliente cliente = encabezadoFactura.getCliente();
         List<DetalleFactura> detalles = encabezadoFactura.getDetalles();
-
-        double total = detalles.stream().mapToDouble(detalle ->
-                detalle.getProducto().getPrecio() * detalle.getCantidad()).sum();
+        double total = detalles.stream().mapToDouble(detalle -> detalle.getProducto().getPrecio() * detalle.getCantidad()).sum();
 
         StringBuilder facturaTexto = new StringBuilder();
         facturaTexto.append("-------------------------------------Factura----------------------------------------------\n");
+        facturaTexto.append("Fecha: ").append(LocalDate.now()).append("\n");
+        facturaTexto.append("ID de la factura: ").append(encabezadoFactura.getId()).append("\n");
         facturaTexto.append("Nombre del Cliente: ").append(cliente.getNombre()).append("\n");
         facturaTexto.append("Cédula: ").append(cliente.getCedula()).append("\n");
         facturaTexto.append("Teléfono: ").append(cliente.getTelefono()).append("\n");
         facturaTexto.append("-------------------------------------Detalle del Pedido-----------------------------------\n");
+
         for (DetalleFactura detalle : detalles) {
             Producto producto = detalle.getProducto();
             int cantidad = detalle.getCantidad();
-            facturaTexto.append("Producto: ").append(producto.getNombreProducto())
-                    .append(" - Cantidad: ").append(cantidad)
-                    .append(" - Precio unitario: ").append(producto.getPrecio())
-                    .append(" - Subtotal: ").append(producto.getPrecio() * cantidad).append("\n");
+            facturaTexto.append("Producto: ").append(producto.getNombreProducto()).append(" - Cantidad: ").append(cantidad).append(" - Precio unitario: ").append(producto.getPrecio()).append(" - Subtotal: ").append(producto.getPrecio() * cantidad).append("\n");
         }
+
         facturaTexto.append("Total: ").append(total);
 
         try (FileWriter writer = new FileWriter("factura.txt")) {
@@ -118,7 +126,7 @@ public class FacturarView extends VerticalLayout {
         clienteComboBox.clear();
         productoComboBox.clear();
         cantidadTextField.clear();
-        encabezadoFactura = null; // Reiniciar el encabezado de la factura
+        encabezadoFactura = null;
         detallesGrid.setItems(); // Limpiar los detalles de la factura
     }
 }
