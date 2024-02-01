@@ -5,5 +5,5 @@ Nombre del Cliente: e
 Cédula: 1726694332
 Teléfono: 0986800831
 -------------------------------------Detalle del Pedido-----------------------------------
-Producto: e - Cantidad: 1 - Precio unitario: 121.0 - Subtotal: 121.0
-Total: 121.0
+Producto: e - Cantidad: 1 - Precio unitario: 1.0 - Subtotal: 1.0
+Total: 1.0

@@ -112,6 +112,10 @@ public class FacturarView extends VerticalLayout {
             Producto producto = detalle.getProducto();
             int cantidad = detalle.getCantidad();
             facturaTexto.append("Producto: ").append(producto.getNombreProducto()).append(" - Cantidad: ").append(cantidad).append(" - Precio unitario: ").append(producto.getPrecio()).append(" - Subtotal: ").append(producto.getPrecio() * cantidad).append("\n");
+
+            // Actualizar valores del producto
+            producto.actualizarStock(cantidad);
+            producto.registrarVenta(cantidad);
         }
 
         facturaTexto.append("Total: ").append(total);
@@ -129,4 +133,5 @@ public class FacturarView extends VerticalLayout {
         encabezadoFactura = null;
         detallesGrid.setItems(); // Limpiar los detalles de la factura
     }
+
 }
